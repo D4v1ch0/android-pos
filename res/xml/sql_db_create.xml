@@ -1,0 +1,234 @@
+<sql>
+    <statement>
+        CREATE TABLE tbProduct(
+        _id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Price REAL
+        );
+    </statement>
+    <statement>
+        CREATE VIRTUAL TABLE tbProductExt USING fts4 (
+        Sku,
+        Description,
+        tokenize=porter
+        );
+    </statement>
+    <statement>
+        CREATE TABLE tbSalesCategory(
+        _id INTEGER PRIMARY KEY AUTOINCREMENT,        
+        Name TEXT,
+        Position SMALLINT
+        );
+    </statement>
+    <statement>
+        CREATE TABLE tbProductSalesCategory(
+        _id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ProductId INT REFERENCES tbProduct(_id),
+        SalesCategoryId INT REFERENCES tbSalesCategory(_id),
+        Position SMALLINT,
+        IsFavorite SMALLINT,
+        FavoritePosition SMALLINT
+        );
+    </statement>
+    <statement>
+    	CREATE TABLE tbClient(
+    	_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    	Address TEXT,
+    	Active SMALLINT    
+    	);
+    </statement>
+    <statement>
+        CREATE VIRTUAL TABLE tbClientExt USING fts4 (
+        CardId,
+        LastNames,
+        Names,
+        tokenize=porter
+        );
+    </statement>
+    <statement>
+    	CREATE TABLE tbTransactionType (
+    	_id INTEGER PRIMARY KEY,
+    	Name TEXT,
+    	Active SMALLINT,
+    	ProductoInsertModePreference SMALLINT
+    	);
+    </statement>
+    <statement>
+        CREATE TABLE tbTransaction (
+        _id INTEGER PRIMARY KEY AUTOINCREMENT,
+        TransactionTypeId INTEGER REFERENCES tbTransactionType(_id),
+        TransactionNumber INTEGER,
+        ClientId INTEGERE REFERENCES tbClient(_id),
+        TransactionDate TEXT,
+        State SMALLINT,
+        Quantity REAL,
+        Subtotal REAL,
+        Discount REAL,
+        SubtotalBeforeTaxes REAL,
+        Taxes REAL,
+        Total REAL
+        );
+    </statement>
+    <statement>
+    	CREATE VIRTUAL TABLE tbTransactionExt USING fts4 (
+    	Code,
+    	ClientCardId,
+    	ClientNames,
+    	DetailResume,
+    	TransactionTypeName,
+    	tokenize=porter
+    	);
+    </statement>
+    <statement>
+        CREATE TABLE tbTransactionDetail (
+        _id INTEGER PRIMARY KEY AUTOINCREMENT,
+        TransactionId INTEGER REFERENCES tbTransaction(_id),
+        ProductId INTEGERE REFERENCES tbProduct(_id),
+        Quantity REAL,
+        Discount REAL,
+        Taxes REAL,
+        Price REAL,
+        SubtotalBeforeTaxes REAL,
+        Subtotal REAL,
+        Total REAL
+        );        
+    </statement>
+    
+    <statement>INSERT INTO tbTransactionType (_id,name,active,ProductoInsertModePreference) Values(1,'Pedido',1,1)</statement>
+    <statement>INSERT INTO tbTransactionType (_id,name,active,ProductoInsertModePreference) Values(2,'Factura',1,2)</statement>
+    
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
+    	
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(1,'0926205873','Almeida López','Darwin')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(2,'0934567892','Alvarado','David')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(3,'0912523892','Lara','Fausto')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(4,'0912523892','Martinez','Jorge')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(5,'0912523892','Rouillon','Eleodoro')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(6,'0912523892','Matamoros','María Piedad')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(7,'0912523892','Gagñay','Juan')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(8,'0912523892','Reinoso','María Augusta')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(9,'0912523892','Burgos Peña','Reinaldo')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(10,'0912523892','Ortiz','Lenin')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(11,'0912523892','Landires','Mariuxi')</statement>
+    <statement>INSERT INTO tbClientExt (docid,cardid,lastnames,names) Values(12,'0912523892','Macio','Michel')</statement>
+        
+    <statement>INSERT INTO tbProduct (price) Values(30)</statement>
+    <statement>INSERT INTO tbProduct (price) Values(30)</statement>
+    <statement>INSERT INTO tbProduct (price) Values(40)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(40)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(30)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(30)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(20)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(20)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(20)</statement>	
+	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(1,'00001','Camiseta Negra')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(2,'00002','Camiseta Rayas Negra')</statement>	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(3,'00003','Pantalón Negro')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(4,'00004','Pantalalón Cafe')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(5,'00005','Camiseta Blanca')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(6,'00006','Camiseta Azul')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(7,'00007','Corbata Rayas Negra')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(8,'00008','Corbata Negra')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(9,'00009','Corbata Azul')</statement>	
+        
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(42)</statement>	
+	<statement>INSERT INTO tbProduct (price) Values(42)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(42)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(42)</statement>
+		
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(10,'00010','Blusa Negra')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(11,'00011','Blusa Rayas Negra')</statement>	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(12,'00012','Falda Negra')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(13,'00013','Pantalón Dama Cafe')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(14,'00014','Pantalón Dama Blanca')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(15,'00015','Pantalón Dama Azul')</statement>
+	
+	<statement>INSERT INTO tbProduct (price) Values(70)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(70)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(70)</statement>	
+	<statement>INSERT INTO tbProduct (price) Values(50)</statement>	
+	<statement>INSERT INTO tbProduct (price) Values(50)</statement>	
+	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(16,'00016','Zapatos Caballeros Negro')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(17,'00017','Zapatos Caballeros Cafe')</statement>	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(18,'00018','Zapatos Caballeros Diseño A')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(19,'00019','Zapatillas Diseño A')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(20,'00020','Zapatillas Diseño B')</statement>
+		
+	<statement>INSERT INTO tbProduct (price) Values(70)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(70)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(70)</statement>			
+	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(21,'00021','Zapatos Damas Negro')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(22,'00022','Zapatos Damas Blanco')</statement>	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(23,'00023','Zapatos Damas Azul')</statement>
+	
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	<statement>INSERT INTO tbProduct (price) Values(35)</statement>
+	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(24,'00024','Pantalón Niño Azul')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(25,'00025','Vestido Niña Blanco')</statement>	
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(26,'00026','Vestido Niña Celeste')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(27,'00027','Camiseta Niño Blanca')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(28,'00028','Camiseta Niño Negra')</statement>
+	<statement>INSERT INTO tbProductExt (docid,sku,description) Values(29,'00029','Camiseta Niño Avengers')</statement>
+			
+	<statement>INSERT INTO tbSalesCategory (_id,Name,Position) Values(0,'Favoritos',0)</statement>
+	<statement>INSERT INTO tbSalesCategory (Name,Position) Values('Caballeros',1)</statement>
+	<statement>INSERT INTO tbSalesCategory (Name,Position) Values('Damas',2)</statement>
+	<statement>INSERT INTO tbSalesCategory (Name,Position) Values('Calzado Caballeros',3)</statement>
+	<statement>INSERT INTO tbSalesCategory (Name,Position) Values('Calzado Damas',4)</statement>
+	<statement>INSERT INTO tbSalesCategory (Name,Position) Values('Niños/Niñas',5)</statement>	
+
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(1,1,1,1,1)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(2,1,2,1,2)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(3,1,3,1,3)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(4,1,4,1,4)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(5,1,5,1,5)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(6,1,6,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(7,1,7,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(8,1,8,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(9,1,9,0,0)</statement>
+	
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(10,2,1,1,6)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(11,2,2,1,7)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(12,2,3,1,8)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(13,2,4,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(14,2,5,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(15,2,6,0,0)</statement>
+	
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(16,3,1,1,9)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(17,3,2,1,10)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(18,3,3,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(19,3,4,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(20,3,5,0,0)</statement>
+		
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(21,4,1,1,11)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(22,4,2,1,12)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(23,4,3,0,0)</statement>
+	
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(24,5,1,1,13)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(25,5,2,1,14)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(26,5,3,1,15)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(27,5,4,1,16)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(28,5,5,0,0)</statement>
+	<statement>INSERT INTO tbProductSalesCategory (ProductId,SalesCategoryId,Position,IsFavorite,FavoritePosition) Values(29,5,6,0,0)</statement>
+	
+</sql>

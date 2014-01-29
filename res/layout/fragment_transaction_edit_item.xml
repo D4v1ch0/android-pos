@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="0dp"
+    android:paddingTop="5dp" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <include layout="@layout/layout_transaction_item" />
+        
+    </ScrollView>
+
+    <include        
+         layout="@layout/layout_transaction_item_action"/>
+
+    <include
+        layout="@layout/base_confirmation_dialog"
+        android:visibility="gone" />
+
+</LinearLayout>

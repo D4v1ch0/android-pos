@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Rp3 Pos</string>
+    <string name="title_transaction_detail">Detalle</string>
+    <string name="hint_search_transaction">Buscar Transacción</string>
+    <string name="hint_search_product">Buscar Producto</string>
+    <string name="hint_search_client">Buscar Cliente</string>
+    <string name="hint_add_product">Agregar Producto</string>       
+    <string name="title_activity_searchable">Búqueda</string>    
+    <string name="hello_world">Hello world!</string>
+    <string name="label_product_add">Agregar Producto</string>
+    <string name="label_total">Total</string>
+    <string name="label_discount">Descuento</string>
+    <string name="label_tax">Impuesto</string>
+    <string name="label_taxes">Impuestos</string>
+    <string name="label_detail">Detalle</string>
+    <string name="label_subtotal">Subtotal</string>
+    <string name="label_subtotal_before_taxes">Antes de Impuestos</string>
+    <string name="label_product">Producto</string>
+    <string name="label_products">Productos</string>
+    <string name="label_quantity">Cantidad</string>
+    <string name="label_transaction_total_quantity">Unidades</string>
+    <string name="label_transaction_total_lines">Items</string>
+    <string name="label_price">Precio</string>    
+    <string name="label_supplier">Proveedor</string>
+    <string name="label_favorites">Favoritos</string>
+    <string name="label_deleted">Eliminado</string>   
+    <string name="message_no_products_yet">No ha ingresado productos&#8230;</string>
+    <string name="message_confirmation_transaction_detail_delete">¿Seguro de eliminar este registro?</string>
+    <string name="message_confirmation_transaction_delete">¿Seguro de eliminar esta transacción?</string>
+    <string name="title_activity_transaction_edit">Transacción</string>
+	<string name="symbol_discount">-</string>
+	<string name="symbol_quantity">x</string>
+	<string name="test_money_value">$100.00</string>
+	<string name="test_transaction_type">Factura</string>
+	<string name="test_client_name">Darwin Almeida</string>
+	<string name="test_product_name">Producto de Prueba</string>
+	<string name="test_number_value">100.00</string>
+	<string name="action_change_product_insert_inline">Acceso rápido de productos</string>
+	<string name="action_change_product_insert_action">Acceso extendido de Productos</string>
+</resources>

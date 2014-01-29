@@ -1,0 +1,77 @@
+<sql>
+    <statement name="SimpleProductSearch">
+        SELECT 
+        tbProductExt.docid AS _id,
+        tbProduct.Price AS Price,
+        tbProductExt.Sku AS tbProductExt_Sku,
+       	tbProductExt.Description AS tbProductExt_Description
+       	FROM tbProductExt       	 
+       	INNER JOIN tbProduct 
+       	ON tbProduct._id = tbProductExt.docid
+       	INNER JOIN ( 
+       	
+       		SELECT 
+        		tbProductExt.docid,
+        		matchinfo( tbProductExt ) AS Rank
+        		FROM tbProductExt
+        		WHERE tbProductExt MATCH ?
+        		ORDER BY rank DESC LIMIT 30 OFFSET 0
+       		
+       	 ) AS tbProductSearch
+       	ON tbProductExt.docid = tbProductSearch.docid       	
+        ORDER BY tbProductSearch.Rank DESC   	
+    </statement>
+    <statement name="ProductById">
+        SELECT 
+        tbProduct._id AS _id,
+        tbProduct.Price AS Price,        
+        tbProductExt.Sku AS tbProductExt_Sku,
+       	tbProductExt.Description AS tbProductExt_Description
+       	FROM tbProduct
+       	JOIN tbProductExt
+       	ON tbProduct._id = tbProductExt.docid
+      	WHERE tbProduct._id = ?
+    </statement>    
+    <statement name="ProductSalesCategoryById">
+        SELECT  
+        tbProductSalesCategory._id,              
+        tbProductSalesCategory.ProductId,
+        tbProductSalesCategory.SalesCategoryId,
+        tbProductExt.Description AS tbProductExt_Description,
+        tbProductExt.Sku AS tbProductExt_Sku,
+        tbProduct.Price AS tbProduct_Price,
+        tbProductSalesCategory.IsFavorite,
+        tbProductSalesCategory.FavoritePosition,
+        tbProductSalesCategory.Position
+        FROM tbProductSalesCategory
+        JOIN tbProduct
+        ON tbProductSalesCategory.ProductId = tbProduct._id
+        JOIN tbProductExt 
+        ON tbProduct._id = tbProductExt.docid
+        JOIN tbSalesCategory
+        ON tbProductSalesCategory.SalesCategoryId = tbSalesCategory._id
+        WHERE tbProductSalesCategory.SalesCategoryId = ?
+        ORDER BY tbProductSalesCategory.Position
+    </statement>
+    <statement name="ProductFavoriteCategory">
+        SELECT        
+        tbProductSalesCategory._id,        
+        tbProductSalesCategory.ProductId,
+        tbProductSalesCategory.SalesCategoryId,
+        tbProductExt.Description AS tbProductExt_Description,
+        tbProductExt.Sku AS tbProductExt_Sku,
+        tbProduct.Price AS tbProduct_Price,
+        tbProductSalesCategory.IsFavorite,        
+        tbProductSalesCategory.FavoritePosition,
+        tbProductSalesCategory.Position
+        FROM tbProductSalesCategory
+        JOIN tbProduct
+        ON tbProductSalesCategory.ProductId = tbProduct._id
+        JOIN tbProductExt 
+        ON tbProduct._id = tbProductExt.docid
+        JOIN tbSalesCategory
+        ON tbProductSalesCategory.SalesCategoryId = tbSalesCategory._id
+        WHERE tbProductSalesCategory.IsFavorite = 1
+        ORDER BY tbProductSalesCategory.FavoritePosition
+    </statement>
+</sql>

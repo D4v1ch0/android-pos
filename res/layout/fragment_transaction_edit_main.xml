@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"    
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"    
+    android:orientation="vertical">
+   <LinearLayout 
+        android:id="@+id/viewGroup_inline_productInsert"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >   
+        <ImageView
+	        android:layout_width="wrap_content" 
+            android:contentDescription="@string/label_product_add"
+            android:layout_height="wrap_content"    
+            android:layout_gravity="center_vertical"            
+            android:src="@drawable/ic_action_new"/>     
+	    <AutoCompleteTextView	        
+	        android:id="@+id/autoCompleteTextView_product_insert"
+	        android:hint="@string/hint_search_product"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"        
+	        android:layout_weight="1"
+	        android:singleLine="true"
+	        android:ellipsize="end"
+	        android:imeOptions="actionDone"
+	        />	    
+	</LinearLayout>
+    <LinearLayout 
+        android:id="@+id/viewGroup_action_productInsert"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"        
+        >
+	    <Button
+		    android:id="@+id/button_product_insert"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:hint="@string/hint_add_product"		  		     
+		    android:drawableLeft="@drawable/ic_action_new"
+    	/>
+    </LinearLayout>
+    <rp3.widget.listview.EnhancedListView
+        android:id="@+id/listView_products"
+        android:layout_width="match_parent"
+		android:layout_height="0dp"		
+        android:layout_weight="1"
+        android:choiceMode="none"       
+        >		
+	</rp3.widget.listview.EnhancedListView>
+	<TextView 	       
+	      android:id="@android:id/empty"     
+          android:layout_width="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_height="0dp"                  	      	                 	            
+          android:text="@string/message_no_products_yet"
+          android:layout_weight="1"
+          android:textAppearance="?android:attr/textAppearanceSearchResultSubtitle"
+		/>
+	
+   		<LinearLayout android:orientation="horizontal"
+       	android:layout_width="match_parent"
+       	android:layout_height="wrap_content">		
+		<Button
+		    android:id="@+id/button_client_search"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:hint="@string/hint_search_client"		    
+		    android:drawableLeft="@drawable/ic_action_person"
+    	/>
+	  
+	</LinearLayout>
+		
+	
+</LinearLayout>

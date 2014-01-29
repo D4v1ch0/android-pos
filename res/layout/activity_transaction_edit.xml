@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"    
+    android:orientation="vertical"
+    tools:context=".transaction.TransactionEditActivity" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="4dp"
+    	android:layout_marginRight="4dp"
+        >
+        <include layout="@layout/layout_transaction_edit_simple" />
+    </FrameLayout>
+
+    <include
+        layout="@layout/base_confirmation_dialog"
+        android:visibility="gone" />
+
+</LinearLayout>

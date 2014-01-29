@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"    
+    android:background="@drawable/base_simple_border_box"    
+     >
+
+    <LinearLayout
+        android:id="@android:id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/button_face"
+        android:orientation="vertical" 
+        android:focusableInTouchMode="true"
+        >
+
+        <TextView
+            android:id="@android:id/text1"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:ellipsize="end"
+            android:lines="3"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/test_client_name"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="@drawable/ic_action_cancel"
+            android:contentDescription="@string/app_name" />
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:focusable="true"                    
+    	android:focusableInTouchMode="true" >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/base_simple_border_box"
+            android:padding="1dp" >
+
+            <TextView
+                android:id="@+id/textView_transactiondetail_product_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:text="@string/test_product_name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/base_simple_border_box"
+            android:padding="1dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="vertical"
+                android:padding="12dp" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    
+                    >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_quantity"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"                         
+                        >
+						
+						<TextView
+                            android:id="@+id/textView_transactiondetail_quantity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"                            
+                            android:padding="10dp"                            
+                            android:singleLine="true"
+                            android:visibility="gone"                            
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:text="@string/test_number_value" />
+						
+                        <EditText
+                            android:id="@+id/editText_transactiondetail_quantity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:imeOptions="actionDone"
+                            android:inputType="numberDecimal"
+                            android:padding="10dp"
+                            android:selectAllOnFocus="true"
+                            android:singleLine="true"
+                            android:text="@string/test_number_value" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_price"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" >
+
+                        <TextView
+                            android:id="@+id/textView_transactiondetail_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:padding="10dp"
+                            android:text="@string/test_number_value"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_subtotal"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" >
+
+                        <TextView
+                            android:id="@+id/textView_transactiondetail_subtotal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:padding="10dp"
+                            android:text="@string/test_money_value"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_discount"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        >
+						
+						<TextView
+                            android:id="@+id/textView_transactiondetail_discount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"                            
+                            android:padding="10dp"                            
+                            android:singleLine="true"
+                            android:visibility="gone"                            
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:text="@string/test_number_value" />
+						
+                        <EditText
+                            android:id="@+id/editText_transactiondetail_discount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:imeOptions="actionDone"
+                            android:inputType="numberDecimal"
+                            android:padding="10dp"
+                            android:selectAllOnFocus="true"
+                            android:singleLine="true"
+                            android:text="@string/test_number_value" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/base_simple_border_box"
+            android:padding="1dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="vertical"
+                android:padding="12dp" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_subtotal_before_taxes"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" >
+
+                        <TextView
+                            android:id="@+id/textView_transactiondetail_before_taxes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:padding="10dp"
+                            android:text="@string/test_money_value"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_taxes"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" >
+
+                        <TextView
+                            android:id="@+id/textView_transactiondetail_taxes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:padding="10dp"
+                            android:text="@string/test_money_value"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="@string/label_total"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" >
+
+                        <TextView
+                            android:id="@+id/textView_transactiondetail_total"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:padding="10dp"
+                            android:text="@string/test_money_value"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+</merge>

@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="4dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:baselineAligned="false"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <include layout="@layout/layout_transaction_edit_simple" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/content_transaction_edit_extension"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"    
+        android:layout_marginLeft="10dp"    
+        android:padding="1dp" >
+    </FrameLayout>
+
+</LinearLayout>

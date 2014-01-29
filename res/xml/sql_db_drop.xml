@@ -1,0 +1,32 @@
+<sql>
+    <statement>
+        DROP TABLE tbTransactionDetail;
+    </statement>
+    <statement>
+    	DROP TABLE tbTransactionExt;
+    </statement>
+    <statement>
+        DROP TABLE tbTransaction;
+    </statement>
+    <statement>
+    	DROP TABLE tbTransactionType;
+    </statement>
+    <statement>
+        DROP TABLE tbProductSalesCategory
+    </statement>
+    <statement>
+        DROP TABLE tbSalesCategory
+    </statement>
+    <statement>
+        DROP TABLE tbProductExt;
+    </statement>
+    <statement>
+        DROP TABLE tbProduct;
+    </statement>
+    <statement>
+        DROP TABLE tbClientExt;
+    </statement>
+    <statement>
+    	DROP TABLE tbClient;
+    </statement>        
+</sql>

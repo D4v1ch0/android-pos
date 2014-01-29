@@ -1,0 +1,6 @@
+<config>
+    <dataBaseConfiguration>       
+       <name>Rp3Pos.db</name>
+       <version>1</version>
+    </dataBaseConfiguration>
+</config>
