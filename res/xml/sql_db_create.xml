@@ -49,7 +49,8 @@
     	_id INTEGER PRIMARY KEY,
     	Name TEXT,
     	Active SMALLINT,
-    	ProductoInsertModePreference SMALLINT
+    	ProductoInsertModePreference SMALLINT,
+    	IsDefault SMALLINT
     	);
     </statement>
     <statement>
@@ -58,7 +59,7 @@
         TransactionTypeId INTEGER REFERENCES tbTransactionType(_id),
         TransactionNumber INTEGER,
         ClientId INTEGERE REFERENCES tbClient(_id),
-        TransactionDate TEXT,
+        TransactionDate INTEGER,
         State SMALLINT,
         Quantity REAL,
         Subtotal REAL,
@@ -93,8 +94,8 @@
         );        
     </statement>
     
-    <statement>INSERT INTO tbTransactionType (_id,name,active,ProductoInsertModePreference) Values(1,'Pedido',1,1)</statement>
-    <statement>INSERT INTO tbTransactionType (_id,name,active,ProductoInsertModePreference) Values(2,'Factura',1,2)</statement>
+    <statement>INSERT INTO tbTransactionType (_id,name,active,ProductoInsertModePreference,IsDefault) Values(1,'Pedido',1,1,1)</statement>
+    <statement>INSERT INTO tbTransactionType (_id,name,active,ProductoInsertModePreference,IsDefault) Values(2,'Factura',1,2,0)</statement>
     
     <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>
     <statement>INSERT INTO tbClient (address) Values('Guayaquil')</statement>

@@ -1,11 +1,11 @@
 package rp3.pos;
 
 import android.app.Activity;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 
@@ -18,6 +18,8 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
 		    
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
     
+    public static final String ARG_TRANSACTIONTYPEID = "transactionTypeId";
+    
     private static final int LOADER_MODE_SEARCH_TEXT = 1;
     private static final int LOADER_MODE_SEARCH_TRANSACTIONTYPE = 2;
     
@@ -25,23 +27,34 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     private static final String LOADER_ARG_SEARCH_TEXT = "LOADER_ARG_SEARCH_TEXT";
     private static final String LOADER_ARG_SEARCH_TRANSACTIONTYPEID = "LOADER_ARG_SEARCH_TRANSACTIONTYPEID";
     
-    private Callbacks mCallbacks;
+    private TransactionListFragmentListener transactionListFragmentCallback;
     private int mActivatedPosition = ListView.INVALID_POSITION;
     private SimpleCursorAdapter adapter;  
+    private int currentTransactionTypeId;
     
-    public interface Callbacks {
-        public void onItemSelected(String id);
+    
+    public static TransactionListFragment newInstance(int transactionTypeId) {
+    	TransactionListFragment fragment = new TransactionListFragment();
+		Bundle args = new Bundle();
+		args.putInt(ARG_TRANSACTIONTYPEID, transactionTypeId);
+		fragment.setArguments(args);
+		return fragment;
+    }
+    
+    public interface TransactionListFragmentListener {
+        public void onTransactionSelected(long id);
     }
 
     public TransactionListFragment() {
     }
 
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-     
-     this.setRetainInstance(true);
-     
+          
+     currentTransactionTypeId = getArguments().getInt(ARG_TRANSACTIONTYPEID);
+        
      String[] fields = {
          Contract.Transaction.FIELD_TRANSACTIONDATE,
          Contract.Transaction.FIELD_TOTAL,
@@ -85,17 +98,24 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
      setListAdapter(adapter);
           
     }
-       
+    
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-    	super.onActivityCreated(savedInstanceState);       	
+    public void onActivityCreated(Bundle savedInstanceState) {    	
+    	super.onActivityCreated(savedInstanceState);
     	
     	Bundle b = new Bundle();
     	b.putInt(LOADER_ARG_SEARCH_MODE, LOADER_MODE_SEARCH_TRANSACTIONTYPE);
-    	b.putInt(LOADER_ARG_SEARCH_TRANSACTIONTYPEID, 0);
-    	this.getLoaderManager().initLoader(0, b, this);
+    	b.putInt(LOADER_ARG_SEARCH_TRANSACTIONTYPEID, currentTransactionTypeId);
     	
-    }    
+    	executeLoader(0, b, this);
+    	
+    }
+    
+    @Override
+    public void onStart() {    	
+    	super.onStart();    	    	
+    }
+         
     
     public void searchTransactions(String termSearch)
     {
@@ -103,7 +123,7 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     	b.putInt(LOADER_ARG_SEARCH_MODE, LOADER_MODE_SEARCH_TEXT);
     	b.putString(LOADER_ARG_SEARCH_TEXT, termSearch);
     	
-    	getLoaderManager().restartLoader(0, b, this);
+    	executeLoader(0, b, this);
     }      
     
     public void loadTransactions(int transactionType)
@@ -112,7 +132,7 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     	b.putInt(LOADER_ARG_SEARCH_MODE, LOADER_MODE_SEARCH_TRANSACTIONTYPE);
     	b.putInt(LOADER_ARG_SEARCH_TRANSACTIONTYPEID, transactionType);
     	
-    	getLoaderManager().restartLoader(0, b, this);
+    	executeLoader(0, b, this);
     }
     
 	@Override
@@ -126,32 +146,38 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
         }
     }
 
+	
+	
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        // Activities containing this fragment must implement its callbacks.
-        if (!(activity instanceof Callbacks)) {
-            throw new IllegalStateException("Activity must implement fragment's callbacks.");
-        }
-
-        mCallbacks = (Callbacks) activity;
+        
+        transactionListFragmentCallback = (TransactionListFragmentListener)getParentFragment();
+//
+//        // Activities containing this fragment must implement its callbacks.
+//        if (!(activity instanceof Callbacks)) {
+//            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+//        }
+//
+//        mCallbacks = (Callbacks) activity;
     }   
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
-        mCallbacks.onItemSelected(String.valueOf(id));        
+        transactionListFragmentCallback.onTransactionSelected(id);        
     }
     
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mActivatedPosition != ListView.INVALID_POSITION) {
-            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);            
         }
     }
+    
+    
 
     /**
      * Turns on activate-on-click mode. When this mode is on, list items will be
@@ -185,7 +211,7 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
 	public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
 		super.onCreateLoader(id, args);
 		
-		int mode = args.getInt(LOADER_ARG_SEARCH_MODE);				
+		int mode = args.getInt(LOADER_ARG_SEARCH_MODE);								
 		
 		SimpleCursorLoader loader;
 		if(mode == LOADER_MODE_SEARCH_TEXT){
@@ -214,12 +240,15 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
 	public void onLoadFinished(Loader<Cursor> loader, Cursor c) {		
 		super.onLoadFinished(loader, c);
 		adapter.swapCursor(c);
+		notifyListChanged();
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {		
 		adapter.swapCursor(null);
+		notifyListChanged();
 	}
 
+	
 	
 }

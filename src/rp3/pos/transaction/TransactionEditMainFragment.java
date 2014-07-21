@@ -1,7 +1,5 @@
 package rp3.pos.transaction;
 
-import java.util.Calendar;
-
 import rp3.pos.R;
 import rp3.pos.adapter.TransactionEditDetailAdapter;
 import rp3.pos.client.SearchClientActivity;
@@ -13,11 +11,15 @@ import rp3.pos.model.TransactionDetail;
 import rp3.pos.model.TransactionType;
 import rp3.pos.product.ProductSearchActivity;
 import rp3.util.CursorUtils;
+import rp3.util.DateTime;
+import rp3.util.Screen;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -27,40 +29,30 @@ import android.widget.SimpleCursorAdapter;
 import rp3.widget.listview.EnhancedListView;
 import rp3.widget.listview.EnhancedListView.Undoable;
 
-public class TransactionEditMainFragment extends rp3.app.BaseFragment {
+public class TransactionEditMainFragment extends rp3.app.BaseFragment 
+	implements TransactionEditItemFragment.TransactionEditItemListener {
 	 
 	public static final String ARG_TRANSACTIONID = "transactionId";
 	public static final String ARG_TRANSACTIONTYPEID = "transactionTypeId";
-	
+			
 	private EnhancedListView listView_detail;
 	private TransactionEditDetailAdapter detail_adapter;
 	private View viewEmptyDetail;	
-	private Transaction transaction;	
-	private TransactionEditListener TransactionEditCallback;
-	private Button button_client;	
+	private Transaction transaction;
+	
+	private Button button_client;
 	
 	private final int REQUEST_CODE_CLIENT_SEARCH = 1;
 	private final int REQUEST_CODE_PRODUCT_SEARCH = 2;
+	private final int REQUEST_CODE_DETAIL_EDIT  = 3;
+	private boolean cancelOnPauseUpdate = false;
+		
 	
 	AutoCompleteTextView textEditProduct;
 	
-	public interface TransactionEditListener
-	{		
-		public void setTransaction(Transaction t);	
-		public Transaction getTransaction();
-		
-		public void onTransactionChange(Transaction t);
-		public void onAddDetail(TransactionDetail detail);
-		public void onTransactionDetailItemSelected(long transactionDetailId);
-	}
-	
 	public TransactionEditMainFragment()
 	{
-	}
-	
-	public Transaction getCurrentTransaction(){
-		return transaction;
-	}
+	}		
 	
 	public static TransactionEditMainFragment newInstance(long transactionId, int transactionTypeId){
 		TransactionEditMainFragment fragment = new TransactionEditMainFragment();
@@ -76,10 +68,9 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 	@Override	
 	public void onCreate(Bundle savedInstanceState) {		
 		super.onCreate(savedInstanceState);
-		//super.setDataBaseParams(DbOpenHelper.class);
-		super.setContentView(R.layout.fragment_transaction_edit_main);
 		
-		this.setRetainInstance(true);	
+		setRetainInstance(true);
+		setContentView(R.layout.fragment_transaction_edit_main, R.menu.activity_transaction_edit);				
 		
 		if(savedInstanceState==null){
 			Bundle arguments = getArguments();
@@ -97,28 +88,36 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 			else{
 				transaction = new Transaction();
 				transaction.setTransactionTypeId(transactionTypeId);
-				transaction.setTransactionDate(Calendar.getInstance().getTime());
+				transaction.setTransactionDate(DateTime.getCurrentDateTime());
 				transaction.setState(Transaction.STATE_DEFAULT);
 			}
 			
 			TransactionType transactionType = TransactionType.getTransactionType(getDataBase(), transaction.getTransactionTypeId());			
-			transaction.setTransactionType(transactionType);
-			
-			TransactionEditCallback.setTransaction(transaction);
+			transaction.setTransactionType(transactionType);						
 		}				
 	}
 	
 	@Override
-	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
-		super.onAttach(activity);
+	public void onAfterCreateOptionsMenu(Menu menu) {		
+		super.onAfterCreateOptionsMenu(menu);
 		
-		if (!(activity instanceof TransactionEditListener)) {
-            throw new IllegalStateException("Activity must implement fragment's TransactionEditListener.");
-        }
-
-		TransactionEditCallback = (TransactionEditListener) activity;
-		TransactionEditCallback.setTransaction(transaction);
+		MenuItem item = menu.findItem(R.id.action_change_product_insert_mode);
+		
+		if(transaction.getTransactionType().getProductoInsertModePreference() == TransactionType.PREFERENCE_PRODUCT_INSERT_ACTION ){			
+			item.setTitle(R.string.action_change_product_insert_inline);
+		}else{			
+			item.setTitle(R.string.action_change_product_insert_action);				
+		}
+		
+	}
+	
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		listView_detail.discardUndo();
+		if(!cancelOnPauseUpdate) insertOrUpdateTransaction();
+		setCancelOnPauseUpdate(false);
 	}
 	
 	@Override
@@ -162,8 +161,7 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 					long id) {
 				// Get the cursor, positioned to the corresponding row in the result set
 	            Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-	 
-	            // Get the Item Number from this row in the database.
+	 	            
 	            String description = CursorUtils.getString( cursor, Contract.Product.FIELD_NAME);
 	            String sku = CursorUtils.getString( cursor, Contract.Product.FIELD_SKU);
 	            Double price = CursorUtils.getDouble( cursor, Contract.Product.FIELD_PRICE);
@@ -204,6 +202,63 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 		notifyTransactionChange();
 	}	
 	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {		
+		
+		case android.R.id.home:			
+			finish();
+			return true;
+		case R.id.action_accept:	
+			//Save in onPause			
+			finish();
+			return true;
+		case R.id.action_discard:
+			
+			showDialogConfirmation(0, R.string.message_confirmation_transaction_delete, 
+					R.string.message_confirmation_transaction_delete);						
+			
+			return true;
+		case R.id.action_change_product_insert_mode:
+			
+			short newMode;
+			
+			if(transaction.getTransactionType().getProductoInsertModePreference() == TransactionType.PREFERENCE_PRODUCT_INSERT_ACTION ){
+				newMode = TransactionType.PREFERENCE_PRODUCT_INSERT_INLINE;
+				item.setTitle(R.string.action_change_product_insert_action);	
+			}else{
+				newMode = TransactionType.PREFERENCE_PRODUCT_INSERT_ACTION;
+				item.setTitle(R.string.action_change_product_insert_inline);				
+			}
+			
+			transaction.getTransactionType().setProductoInsertModePreference(newMode);
+			TransactionType.updateProductInsertModePreference(getDataBase(),transaction.getTransactionTypeId(),newMode);
+			
+			setInsertProductMode(newMode);
+			
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+		
+	}
+	
+	@Override
+	public void onPositiveConfirmation(int id) {		
+		super.onPositiveConfirmation(id);		
+		Transaction.delete(getDataBase(), transaction);
+		finish();
+	}
+	
+	private void insertOrUpdateTransaction(){					
+		Transaction.insertOrUpdate(getDataBase(), transaction);				
+	}
+	
+	private void setCancelOnPauseUpdate(boolean cancel){
+		cancelOnPauseUpdate = cancel;
+	}
+	
 	public void setInsertProductMode(short mode) {		
 		if(mode == TransactionType.PREFERENCE_PRODUCT_INSERT_INLINE){
 			setViewVisibility(R.id.viewGroup_inline_productInsert, View.VISIBLE);
@@ -216,8 +271,31 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 		}
 	}	
 			
-	private void notifyTransactionChange(){
-		TransactionEditCallback.onTransactionChange(transaction);
+	private void notifyTransactionChange(){		
+		updateTransactionResume();
+	}
+	
+	private void showDetailDialog(long transactionDetailId){
+		TransactionEditItemFragment fragment = TransactionEditItemFragment.newInstance(transactionDetailId);		
+		showDialogFragment(fragment,"detailDialog");
+	}
+	
+	private void startDetailEditActivity(long transactionDetailId){				
+		startActivityForResult( TransactionEditItemActivity.newIntent(getContext(), transactionDetailId), 
+				REQUEST_CODE_DETAIL_EDIT);		
+	}
+	
+	private void onAddDetail(TransactionDetail detail) {
+		setCancelOnPauseUpdate(true);
+		insertOrUpdateTransaction();		
+		onTransactionDetailItemSelected(detail.getID());
+	}
+	
+	public void onTransactionDetailItemSelected(long transactionDetailId) {		
+		if(Screen.isMinLargeLayoutSize(this.getContext()))
+			showDetailDialog(transactionDetailId);
+		else
+			startDetailEditActivity(transactionDetailId);			
 	}
 	
 	private void setUpListView(){
@@ -231,10 +309,10 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 					long id) {
 		      	if(id==0){
-		  			TransactionEditCallback.onAddDetail(transaction.getTransactionDetails().get(position));		  		
+		  			onAddDetail(transaction.getTransactionDetails().get(position));		  		
 		  		}
 		  		else{									
-		  			TransactionEditCallback.onTransactionDetailItemSelected(id);			    	  
+		  			onTransactionDetailItemSelected(id);			    	  
 		      }
 			}		
 		});
@@ -265,7 +343,7 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 
 			      // Delete item completely from your persistent storage
 			      @Override public void discard() {
-			    	  TransactionDetail.delete( getDataBase(), item.getTransactionDetailId() );
+			    	  TransactionDetail.delete( getDataBase(), item.getID() );
 			    	  updateTransactionDetail();
 			      }
 			    };
@@ -276,13 +354,7 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 		listView_detail.setRequireTouchBeforeDismiss(false);
 
 		listView_detail.setAdapter(detail_adapter);
-	}
-	
-	@Override
-	public void onPause() {		
-		super.onPause();
-		listView_detail.discardUndo();
-	}
+	}		
 	
 	
 	private void updateTransactionDetail(){
@@ -333,9 +405,9 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 	
 	public void requireRefreshDataTransaction(){
 		
-		if(transaction.getTransactionId()!=0)
+		if(transaction.getID()!=0)
 		{			
-			transaction.setTransactionDetails( TransactionDetail.getTransactionDetails(getDataBase(), transaction.getTransactionId()) );
+			transaction.setTransactionDetails( TransactionDetail.getTransactionDetails(getDataBase(), transaction.getID()) );
 		
 			detail_adapter = null;
 			detail_adapter = newInstanceDetailAdpater();
@@ -360,6 +432,10 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		switch (requestCode) {
+		case REQUEST_CODE_DETAIL_EDIT:
+			if(resultCode == Activity.RESULT_OK)
+				refreshDetail();
+			break;
 		case REQUEST_CODE_CLIENT_SEARCH:
 			if(resultCode == Activity.RESULT_OK)
 			{
@@ -380,10 +456,37 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment {
 								
 				TransactionDetail detail = addProduct(productId, product.getSku(), product.getDescription(), product.getPrice(), 0);				
 				
-				TransactionEditCallback.onAddDetail(detail);				
+				
+				onAddDetail(detail);				
 			}
 			break;		
 		}
 	}	
+	
+	private void updateTransactionResume()
+	{
+		setTextViewCurrencyText(R.id.textView_transaction_subtotal, transaction.getSubtotal());
+		setTextViewCurrencyText(R.id.textView_transaction_tax, transaction.getTaxes());
+		setTextViewCurrencyText(R.id.textView_transaction_discount, transaction.getDiscount());
+		setTextViewCurrencyText(R.id.textView_transaction_total, transaction.getTotal());
+	}
 
+	
+	private void refreshDetail(){
+		requireRefreshDataTransaction();
+	}
+
+	@Override
+	public void onItemEditAcceptAction(TransactionDetail transactionDetail) {
+		refreshDetail();		
+	}
+
+	@Override
+	public void onItemEditCancelAction(TransactionDetail transactionDetail) {		
+	}
+	
+	@Override
+	public void onItemEditDiscardAction(TransactionDetail transactionDetail) {		
+		refreshDetail();		
+	}
 }

@@ -14,16 +14,16 @@ import rp3.pos.model.Transaction;
 import rp3.pos.model.SalesCategory;
 import rp3.util.Screen;
 import android.app.Activity;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.app.LoaderManager.LoaderCallbacks;
 import org.askerov.dynamicgid.DynamicGridView;
 import org.askerov.dynamicgid.DynamicGridView.OnDropListener;
 
@@ -34,7 +34,7 @@ public class TransactionEditExtensionFragment extends rp3.app.BaseFragment  {
 	private int salesCategoryId = 0;
 	
 	private LoaderProductSalesCategory loaderProductCategoryCallback;
-	
+	 
 	private final int LOADER_SALESCATEGORY = 0;
 	private final int LOADER_PRODUCTBYCATEGORY = 1;
 	private Transaction transaction;
@@ -117,7 +117,7 @@ public class TransactionEditExtensionFragment extends rp3.app.BaseFragment  {
 	@Override
 	public void onFragmentCreateView(View rootView, Bundle savedInstanceState) {		
 		
-		setListViewAdapter(R.id.listView_salesCategory, salesCategoryAdapter);
+		setViewAdapter(R.id.listView_salesCategory, salesCategoryAdapter);
 				
 		if(Screen.isXLargeLayoutSize(this.getActivity()))
 			numColums = 4;
@@ -177,7 +177,7 @@ public class TransactionEditExtensionFragment extends rp3.app.BaseFragment  {
 			((ListView)rootView.findViewById(R.id.listView_salesCategory)).setItemChecked(0, true);
 		}
 		
-		setListViewOnItemClickListener(R.id.listView_salesCategory, new AdapterView.OnItemClickListener() {
+		setViewOnItemClickListener(R.id.listView_salesCategory, new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long id) {
@@ -229,7 +229,7 @@ public class TransactionEditExtensionFragment extends rp3.app.BaseFragment  {
 		}
 		
 		return loader;
-	}
+	} 
 	
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor c) {		

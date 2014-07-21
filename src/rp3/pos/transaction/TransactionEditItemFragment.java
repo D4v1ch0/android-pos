@@ -14,30 +14,28 @@ public class TransactionEditItemFragment extends BaseFragment {
 	
 	private TransactionDetail transactionDetail;
 	private long transactionDetailId = 0;
-	private TransactionEditItemListener callback;
-	private boolean isDialog = false;	
+	private TransactionEditItemListener callback;	
 	
 	public interface TransactionEditItemListener{
 		
 		void onItemEditAcceptAction(TransactionDetail transactionDetail);
 		void onItemEditCancelAction(TransactionDetail transactionDetail);
 		void onItemEditDiscardAction(TransactionDetail transactionDetail);
+		
 	}
 	
 	
-	public static TransactionEditItemFragment newInstance(long transactionDetailId,boolean asDialog){
+	public static TransactionEditItemFragment newInstance(long transactionDetailId){
 		Bundle arguments = new Bundle();
 		arguments.putLong(TransactionEditItemFragment.ARG_TRANSACTION_DETAIL_ID, transactionDetailId);
 		TransactionEditItemFragment fragment = new TransactionEditItemFragment();
-		fragment.setArguments(arguments);
-		fragment.isDialog = asDialog;			
+		fragment.setArguments(arguments);		
 		return fragment;
 	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//super.setDataBaseParams(DbOpenHelper.class);
 		
 		setContentView(R.layout.fragment_transaction_edit_item);
 		setRetainInstance(true);
@@ -57,16 +55,22 @@ public class TransactionEditItemFragment extends BaseFragment {
 	@Override
 	public void onAttach(Activity activity) {		
 		super.onAttach(activity);
-		if (!(activity instanceof TransactionEditItemListener)) {
-            throw new IllegalStateException("Activity must implement fragment's TransactionEditItemListener.");
-        }
+		if(getParentFragment() != null){
+			if(!(getParentFragment() instanceof TransactionEditItemListener)) {
+				throw new IllegalStateException("Parent Fragment must implement fragment's TransactionEditItemListener.");				
+			}
+			callback = (TransactionEditItemListener)getParentFragment();
+		}
+		else if (!(activity instanceof TransactionEditItemListener)) {
+			throw new IllegalStateException("Activity must implement fragment's TransactionEditItemListener.");
+        }		
 		callback = (TransactionEditItemListener)activity;
 	}
 	
 	@Override
 	public void onFragmentCreateView(View rootView, Bundle savedInstanceState) {		
 		
-		if(isDialog)
+		if(isDialog())
 			this.getDialog().setTitle(R.string.label_detail);
 			
 		setImageButtonClickListener(R.id.button_accept, new View.OnClickListener() {
@@ -74,7 +78,7 @@ public class TransactionEditItemFragment extends BaseFragment {
 			public void onClick(View v) {				
 				updateTransactionDetail();				
 				callback.onItemEditAcceptAction(transactionDetail);
-				if(isDialog) dismiss();
+				finish();
 			}
 		});
 				
@@ -82,7 +86,7 @@ public class TransactionEditItemFragment extends BaseFragment {
 			
 			public void onClick(View v) {				
 				callback.onItemEditCancelAction(transactionDetail);
-				if(isDialog) dismiss();
+				finish();
 			}
 		});
 		
@@ -93,7 +97,7 @@ public class TransactionEditItemFragment extends BaseFragment {
 			}
 		});
 					
-		if(isDialog)
+		if(isDialog())
 			setViewVisibility(R.id.button_discard, View.VISIBLE);
 		else
 			setViewVisibility(R.id.button_discard, View.GONE);
@@ -131,7 +135,7 @@ public class TransactionEditItemFragment extends BaseFragment {
 	private void deleteDetail(){				
 		TransactionDetail.delete(getDataBase(), transactionDetailId);
 		callback.onItemEditDiscardAction(transactionDetail);
-		if(isDialog) dismiss();
+		finish();
 	}
 	
 	@Override

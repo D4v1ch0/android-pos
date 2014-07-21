@@ -1,26 +1,17 @@
 package rp3.pos;
 
-import java.util.List;
-
 import rp3.pos.db.DbOpenHelper;
 import rp3.pos.model.Transaction;
 import rp3.pos.model.TransactionType;
 import rp3.pos.transaction.TransactionEditActivity;
-import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.SearchView;
-import android.widget.SpinnerAdapter;
 
 
-public class TransactionListActivity extends rp3.app.BaseActivity
-        implements TransactionListFragment.Callbacks, TransactionDetailFragment.TransactionDetailListener {
+public class TransactionListActivity extends rp3.app.NavActivity
+        implements TransactionListFragment.TransactionListFragmentListener, TransactionDetailFragment.TransactionDetailListener {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -29,78 +20,73 @@ public class TransactionListActivity extends rp3.app.BaseActivity
 	private final String STATE_CURRENT_TRANSACTIONTYPE = "transactiontype";
 	private final String STATE_WAIT_FOR_UPDATE = "waitforupdate";
 	
+	private final static String EXTRA_TRANSACTIONTYPE = "TRANSACTIONTYPE";
+	
     private boolean mTwoPane;
-    private List<TransactionType> transactionTypes;   
-    private int transactionTypeSelected;
+    private int currentTrasantionTypeId;
     private long selectedTransactionId;
     
+    private TransactionType transactionType;
     private boolean waitUpdate = false;    
     private MenuItem menuItemActionEdit;
     private MenuItem menuItemActionDiscard;
     private TransactionDetailFragment transactionDetailFragment;
     
+    public static Intent newIntent(Context c, int transactionTypeId) {
+    	Intent i = new Intent(c, TransactionListActivity.class);
+    	i.putExtra(EXTRA_TRANSACTIONTYPE, transactionTypeId);
+    	return i;
+    }
+    
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);               
         super.setDataBaseParameters(DbOpenHelper.class);               
-        setContentView(R.layout.activity_transaction_list);
         
-        ActionBar actionBar = this.getActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        
-        transactionTypes = TransactionType.getActiveTransactionTypes(getDataBase(),true);
-        SpinnerAdapter mSpinnerAdapter = new ArrayAdapter<TransactionType>(this, 
-        		R.layout.rowlist_spinner_transactiontype,
-        		android.R.id.text1,
-        		transactionTypes);
+        setPaneContentView(R.layout.fragment_transaction);                                    
 
-        actionBar.setListNavigationCallbacks(mSpinnerAdapter, 
-            	new OnNavigationListener() {
-
-            	  @Override
-            	  public boolean onNavigationItemSelected(int position, long itemId) {
-            		  if(transactionTypeSelected != position)
-            		  {            		  		            		
-		            		transactionTypeSelected = position;		            		
-		            		refreshTransactions();
-		            		
-		            		if(mTwoPane)
-		            			clearDetail();
-            		  }
-            		  return true;
-            	  }
-            	});                
-        
         if (findViewById(R.id.content_transaction_detail) != null) {     
             mTwoPane = true;            
-            ((TransactionListFragment) getFragmentManager()
-                    .findFragmentById(R.id.transaction_list))
+            ((TransactionListFragment) getCurrentFragmentManager()
+                    .findFragmentById(R.id.content_transaction_list))
                     .setActivateOnItemClick(true);
         }
         
         if(savedInstanceState!=null)
         {
-        	transactionTypeSelected =  savedInstanceState.getInt(STATE_CURRENT_TRANSACTIONTYPE);
-        	waitUpdate = savedInstanceState.getBoolean(STATE_WAIT_FOR_UPDATE);
-        	actionBar.setSelectedNavigationItem(transactionTypeSelected);
+        	currentTrasantionTypeId =  savedInstanceState.getInt(STATE_CURRENT_TRANSACTIONTYPE);
+        	waitUpdate = savedInstanceState.getBoolean(STATE_WAIT_FOR_UPDATE);        	
         }
         else      
         {
-        	transactionTypeSelected = 0; 
+        	 if(getIntent().hasExtra(EXTRA_TRANSACTIONTYPE)){
+             	currentTrasantionTypeId = getIntent().getIntExtra(EXTRA_TRANSACTIONTYPE, 0);             	
+             }             
+        	 
         	selectedTransactionId = 0;
         	if(mTwoPane){
         		clearDetailContent();
         	}
         }
+        
+        if(currentTrasantionTypeId == 0){
+        	transactionType = TransactionType.getDefaultTransactionType(getDataBase());
+        	currentTrasantionTypeId = transactionType.getTransactionTypeId();
+        }
+        else{
+        	transactionType = TransactionType.getTransactionType(getDataBase(), currentTrasantionTypeId);
+        }
+        
+        setNavigationSelection(currentTrasantionTypeId);
+        setTitle(transactionType.getName());
     }
 
 	private void refreshTransactions(){
-		((TransactionListFragment) getFragmentManager()
-				.findFragmentById(R.id.transaction_list)).
-				loadTransactions(transactionTypes.get(transactionTypeSelected).getTransactionTypeId());
+		((TransactionListFragment) getCurrentFragmentManager()
+				.findFragmentById(R.id.content_transaction_list)).
+				loadTransactions(transactionType.getTransactionTypeId());
 		
-		if(mTwoPane) onItemSelected(String.valueOf(selectedTransactionId));
+		if(mTwoPane) onTransactionSelected(selectedTransactionId);
 		
 		waitUpdate = false;
 	}
@@ -108,7 +94,7 @@ public class TransactionListActivity extends rp3.app.BaseActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
     	super.onSaveInstanceState(outState);
-    	outState.putInt(STATE_CURRENT_TRANSACTIONTYPE, transactionTypeSelected);
+    	outState.putInt(STATE_CURRENT_TRANSACTIONTYPE, currentTrasantionTypeId );
     	outState.putBoolean(STATE_WAIT_FOR_UPDATE, waitUpdate);
     }
     
@@ -119,8 +105,8 @@ public class TransactionListActivity extends rp3.app.BaseActivity
     		case R.id.action_new:
     			waitUpdate = true;
     			int transactionTypeNew = TransactionType.TYPE_ORDER;    			
-    			if(transactionTypeSelected != 0){
-    				transactionTypeNew = transactionTypes.get(transactionTypeSelected).getTransactionTypeId();
+    			if(currentTrasantionTypeId != 0){
+    				transactionTypeNew = transactionType.getTransactionTypeId();
     			}    			
     			 
     			Intent editIntent = new Intent(this, TransactionEditActivity.class);
@@ -142,28 +128,7 @@ public class TransactionListActivity extends rp3.app.BaseActivity
     	return super.onOptionsItemSelected(item);
     }
     
-    @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-    	getMenuInflater().inflate(R.menu.activity_transaction_list, menu);    	
-        
-    	
-    	SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        //SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-    	SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        // Assumes current activity is the searchable activity
-        if(null!=searchManager ) {   
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        }
-        searchView.setIconifiedByDefault(false);
-        
-        menuItemActionEdit = menu.findItem(R.id.action_edit);
-        menuItemActionDiscard = menu.findItem(R.id.action_discard);
-        
-        boolean visibleActionDetail = mTwoPane && selectedTransactionId != 0;
-        setVisibleEditActionButtons(visibleActionDetail);
-        
-    	return super.onCreateOptionsMenu(menu);
-    }
+
    
     @Override
     protected void onStart() {
@@ -198,17 +163,17 @@ public class TransactionListActivity extends rp3.app.BaseActivity
      * indicating that the item with the given ID was selected.
      */
     @Override
-    public void onItemSelected(String id) {    	
+    public void onTransactionSelected(long id) {    	
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.        
-        	selectedTransactionId = Long.parseLong(id);
+        	selectedTransactionId = id;
         	setVisibleEditActionButtons( selectedTransactionId != 0 );
         	
         	transactionDetailFragment = TransactionDetailFragment.newInstance(selectedTransactionId); 
         	
-        	getFragmentManager().beginTransaction()
+        	getCurrentFragmentManager().beginTransaction()
                     .replace(R.id.content_transaction_detail, 
                     		transactionDetailFragment)
                     .commit();
@@ -217,7 +182,7 @@ public class TransactionListActivity extends rp3.app.BaseActivity
         	waitUpdate = true;
         	
             Intent detailIntent = new Intent(this, TransactionDetailActivity.class);
-            detailIntent.putExtra(TransactionDetailFragment.ARG_ITEM_ID, Long.parseLong(id));
+            detailIntent.putExtra(TransactionDetailFragment.ARG_ITEM_ID, id);
             detailIntent.putExtra(TransactionDetailFragment.ARG_PARENT_SOURCE, 
             		TransactionDetailFragment.PARENT_SOURCE_LIST);
             startActivity(detailIntent);
@@ -231,22 +196,11 @@ public class TransactionListActivity extends rp3.app.BaseActivity
     
     private void clearDetailContent(){
     	transactionDetailFragment = TransactionDetailFragment.newInstance(0);
-    	getFragmentManager().beginTransaction()
+    	getSupportFragmentManager().beginTransaction()
         .replace(R.id.content_transaction_detail, 
         		transactionDetailFragment)
         .commit();
-    }
-    
-    private void clearDetail()
-    {
-    	setVisibleEditActionButtons(false);
-    	
-    	clearDetailContent();
-    	
-    	((TransactionListFragment) getFragmentManager()
-                .findFragmentById(R.id.transaction_list))
-                .clearActivatedPosition();
-    }
+    }   
 
 	@Override
 	public void onDeleteSuccess(Transaction transaction) {

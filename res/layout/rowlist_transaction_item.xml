@@ -5,18 +5,17 @@
     android:baselineAligned="false"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" 
-    android:paddingLeft="2dp"   
-    android:paddingRight="2dp"        
-    style="@style/activated">
+    android:paddingLeft="12dp"   
+    android:paddingRight="12dp"        
+    style="@style/Widget.ListViewItem.Activated">
     
     <LinearLayout android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_weight="3"        
         android:orientation="vertical">
         <TextView android:id="@+id/textView_transaction_client"
-            android:layout_width="match_parent"
-            android:textSize="20sp"
-            android:textStyle="bold"
+            android:layout_width="match_parent"            
+            style="@style/Widget.TextView.Highlight.Medium"            
             android:ellipsize="end"
             android:singleLine="true"
             android:layout_height="wrap_content"/>
@@ -25,10 +24,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView android:id="@+id/textView_transaction_typeName"
-	        	android:layout_width="wrap_content"       
-	            android:layout_height="wrap_content"/>
+	        	android:layout_width="wrap_content"	        	       
+	            android:layout_height="wrap_content"
+	            style="@style/Widget.TextView.Small"/>
 	        <TextView android:id="@+id/textView_transaction_id"
 	        	android:layout_width="0dp"
+	        	style="@style/Widget.TextView.Small"
 	        	android:layout_weight="1"       
 	        	android:layout_marginLeft="4dp"
 	            android:layout_height="wrap_content"/>
@@ -36,6 +37,7 @@
         <TextView android:id="@+id/textView_transaction_detailPreview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            style="@style/Widget.TextView.SecondaryHighlight.XSmall"
             android:singleLine="true"
 			android:ellipsize="end"
            />        

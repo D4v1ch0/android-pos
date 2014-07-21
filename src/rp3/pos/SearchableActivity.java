@@ -1,9 +1,9 @@
 package rp3.pos;
 
+import rp3.app.BaseActivity;
 import rp3.pos.model.Transaction;
 import rp3.pos.transaction.TransactionEditActivity;
 import android.os.Bundle;
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.view.Menu;
@@ -12,8 +12,8 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
 
-public class SearchableActivity extends Activity
-	implements TransactionListFragment.Callbacks, TransactionDetailFragment.TransactionDetailListener {
+public class SearchableActivity extends BaseActivity
+	implements TransactionListFragment.TransactionListFragmentListener, TransactionDetailFragment.TransactionDetailListener {
 
 	private boolean mTwoPane;
 	private String query;
@@ -27,7 +27,7 @@ public class SearchableActivity extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_transaction_list);				
+		setContentView(R.layout.fragment_transaction);				
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
@@ -47,36 +47,37 @@ public class SearchableActivity extends Activity
 
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
-            ((TransactionListFragment) getFragmentManager()
-                    .findFragmentById(R.id.transaction_list))
+            ((TransactionListFragment) getCurrentFragmentManager()
+                    .findFragmentById(R.id.content_transaction_list))
                     .setActivateOnItemClick(true);
         }
 	}
 
 	private void executeSearch(String query)
 	{
-		((TransactionListFragment) getFragmentManager()
-				.findFragmentById(R.id.transaction_list)).
+		((TransactionListFragment) getCurrentFragmentManager()
+				.findFragmentById(R.id.content_transaction_list)).
 				searchTransactions(query);
 	}
 	
 	@Override
-	public void onItemSelected(String id) {
+	public void onTransactionSelected(long id) {
 		
-		selectedTransactionId = Long.parseLong(id);
+		selectedTransactionId = id;
 		
 		if (mTwoPane) {      			
 			transactionDetailFragment = TransactionDetailFragment.newInstance(selectedTransactionId);
 			setVisibleEditActionButtons( selectedTransactionId != 0 );
 			
-			getFragmentManager().beginTransaction()
+			
+			getCurrentFragmentManager().beginTransaction()
             .replace(R.id.content_transaction_detail, 
             		transactionDetailFragment)
             .commit();
 
         } else {           
             Intent detailIntent = new Intent(this, TransactionDetailActivity.class);
-            detailIntent.putExtra(TransactionDetailFragment.ARG_ITEM_ID, Long.parseLong(id));
+            detailIntent.putExtra(TransactionDetailFragment.ARG_ITEM_ID, id);
             detailIntent.putExtra(TransactionDetailFragment.ARG_PARENT_SOURCE, TransactionDetailFragment.PARENT_SOURCE_SEARCH);
             startActivity(detailIntent);
         }  

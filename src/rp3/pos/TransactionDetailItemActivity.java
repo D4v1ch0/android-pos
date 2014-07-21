@@ -34,7 +34,7 @@ public class TransactionDetailItemActivity extends rp3.app.BaseActivity {
 		
 		FragmentManager fm = getFragmentManager();
 		if(fm.findFragmentById(R.id.content_transaction_detail_item)==null){
-			getFragmentManager().beginTransaction().replace(R.id.content_transaction_detail_item,
+			getCurrentFragmentManager().beginTransaction().replace(R.id.content_transaction_detail_item,
 					TransactionDetailItemFragment.newInstance(transactionDetailId,false) ).commit();
 		}
 	}

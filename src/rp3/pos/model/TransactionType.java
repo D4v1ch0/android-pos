@@ -5,6 +5,8 @@ import java.util.List;
 
 import rp3.db.sqlite.DataBase;
 import rp3.pos.db.Contract;
+import rp3.util.Convert;
+import rp3.util.CursorUtils;
 import rp3.util.Format;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -21,6 +23,7 @@ public class TransactionType {
 	private int transactionTypeId;
 	private String name;
 	private boolean active;
+	private boolean isDefault;
 	private int position;
 	private short productoInsertModePreference;
 	
@@ -41,6 +44,12 @@ public class TransactionType {
 	}
 	public void setActive(boolean active) {
 		this.active = active;
+	}	
+	public boolean isDefault() {
+		return isDefault;
+	}
+	public void setDefault(boolean value) {
+		this.isDefault = value;
 	}	
 	public int getPosition() {
 		return position;
@@ -67,11 +76,35 @@ public class TransactionType {
 		return db.update(Contract.TransactionType.TABLE_NAME, values, transactionTypeId) != 0;		
 	}
 	
+	public static TransactionType getDefaultTransactionType(DataBase db){
+		Cursor c = db.query(Contract.TransactionType.TABLE_NAME, 
+				new String[] { Contract.TransactionType._ID,
+							   Contract.TransactionType.FIELD_NAME,
+							   Contract.TransactionType.FIELD_ACTIVE,
+							   Contract.TransactionType.FIELD_DEFAULT,
+							   Contract.TransactionType.FIELD_PRODUCT_INSERT_MODE_PREFERENCE}, 
+	            Contract.TransactionType.COLUMN_DEFAULT + " = ?",
+	            Convert.getStringArrayFromScalar(Format.getDataBaseBoolean(true)));
+		
+		c.moveToFirst();
+		
+		TransactionType returnValue = new TransactionType();
+		returnValue.setTransactionTypeId( c.getInt(c.getColumnIndex(Contract.TransactionType._ID)));
+		returnValue.setName( c.getString(c.getColumnIndex(Contract.TransactionType.FIELD_NAME)) );
+		returnValue.setDefault( CursorUtils.getBoolean(c, Contract.TransactionType.FIELD_DEFAULT) );
+		returnValue.setActive( CursorUtils.getBoolean(c, Contract.TransactionType.FIELD_ACTIVE) );
+		
+		returnValue.setProductoInsertModePreference( c.getShort(c.getColumnIndex(Contract.TransactionType.FIELD_PRODUCT_INSERT_MODE_PREFERENCE)));
+		
+		return returnValue;
+	}
+	
 	public static TransactionType getTransactionType(DataBase db, int type){
 		Cursor c = db.query(Contract.TransactionType.TABLE_NAME, 
 				new String[] { Contract.TransactionType._ID,
 							   Contract.TransactionType.FIELD_NAME,
 							   Contract.TransactionType.FIELD_ACTIVE,
+							   Contract.TransactionType.FIELD_DEFAULT,
 							   Contract.TransactionType.FIELD_PRODUCT_INSERT_MODE_PREFERENCE}, 
 	            Contract.TransactionType._ID + " = ?",
 	            String.valueOf(type));
@@ -81,8 +114,8 @@ public class TransactionType {
 		TransactionType returnValue = new TransactionType();
 		returnValue.setTransactionTypeId( c.getInt(c.getColumnIndex(Contract.TransactionType._ID)));
 		returnValue.setName( c.getString(c.getColumnIndex(Contract.TransactionType.FIELD_NAME)) );
-		returnValue.setActive( Format.getBooleanFromDataBaseInteger( 
-				c.getInt(c.getColumnIndex(Contract.TransactionType.FIELD_ACTIVE)) ));
+		returnValue.setDefault( CursorUtils.getBoolean(c, Contract.TransactionType.FIELD_DEFAULT) );
+		returnValue.setActive( CursorUtils.getBoolean(c, Contract.TransactionType.FIELD_ACTIVE) );
 		
 		returnValue.setProductoInsertModePreference( c.getShort(c.getColumnIndex(Contract.TransactionType.FIELD_PRODUCT_INSERT_MODE_PREFERENCE)));
 		

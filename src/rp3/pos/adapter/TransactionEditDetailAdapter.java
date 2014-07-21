@@ -45,7 +45,7 @@ public class TransactionEditDetailAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return ((TransactionDetail)getItem(position)).getTransactionDetailId();
+		return ((TransactionDetail)getItem(position)).getID();
 	}
 
 	public void remove(int position){

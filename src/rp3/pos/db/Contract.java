@@ -147,11 +147,13 @@ public final class Contract {
     public static abstract class TransactionType implements BaseColumns {
         public static final String TABLE_NAME = "tbTransactionType";         
         public static final String COLUMN_NAME = "Name";
-        public static final String COLUMN_ACTIVE = "Active";                
+        public static final String COLUMN_ACTIVE = "Active";
+        public static final String COLUMN_DEFAULT = "IsDefault";
         public static final String COLUMN_PRODUCT_INSERT_MODE_PREFERENCE = "ProductoInsertModePreference";
         
         public static final String FIELD_NAME = COLUMN_NAME;
         public static final String FIELD_ACTIVE = COLUMN_ACTIVE;
+        public static final String FIELD_DEFAULT = COLUMN_DEFAULT;
         public static final String FIELD_PRODUCT_INSERT_MODE_PREFERENCE = COLUMN_PRODUCT_INSERT_MODE_PREFERENCE;
     }
             

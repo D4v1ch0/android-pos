@@ -70,6 +70,7 @@
     	/>
 	  
 	</LinearLayout>
-		
+	<include layout="@layout/layout_transaction_edit_resume" >
+    </include>
 	
 </LinearLayout>

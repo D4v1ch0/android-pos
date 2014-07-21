@@ -2,11 +2,13 @@ package rp3.pos;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
 import rp3.pos.adapter.TransactionEditDetailAdapter;
 import rp3.pos.model.Transaction;
+import rp3.pos.transaction.TransactionEditActivity;
 
 public class TransactionDetailFragment extends rp3.app.BaseFragment {
     /**
@@ -23,25 +25,20 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
     
     private Transaction transaction;
     private long transactionId;
+    
     private TransactionDetailListener transactionDetailCallback;
     
     
     public interface TransactionDetailListener{
     	public void onDeleteSuccess(Transaction transaction);
     }
-    
-    
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+            
     public TransactionDetailFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //super.setDataBaseParams(DbOpenHelper.class);        
+        super.onCreate(savedInstanceState);                
         setRetainInstance(true);
         
         if (getArguments().containsKey(ARG_ITEM_ID)) {            
@@ -57,7 +54,7 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
         }
         
         if(transaction!=null){
-        	super.setContentView(R.layout.fragment_transaction_detail);
+        	super.setContentView(R.layout.fragment_transaction_detail, R.menu.fragment_transaction_detail);
         }
         else{
         	super.setContentView(R.layout.base_content_no_selected_item);
@@ -121,14 +118,14 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
 //        	});
         	        
         	
-        	setListViewAdapter(R.id.listView_products,adapter);
+        	setViewAdapter(R.id.listView_products,adapter);
         	
-        	setListViewOnItemClickListener(R.id.listView_products, new AdapterView.OnItemClickListener() {
+        	setViewOnItemClickListener(R.id.listView_products, new AdapterView.OnItemClickListener() {
     			@Override
     			public void onItemClick(AdapterView<?> arg0, View view, int position,
     					long id) {  
     				
-    				if(rp3.util.Screen.isMinLageLayoutSize(getActivity()))    				
+    				if(rp3.util.Screen.isMinLargeLayoutSize(getActivity()))    				
     					showItemDialog(id);
     				else{
     					startActivity(TransactionDetailItemActivity.newIntent(getActivity(), id));
@@ -156,7 +153,7 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
     @Override
     public void onPositiveConfirmation(int id) {
     	super.onPositiveConfirmation(id);
-    	Transaction.delete(getDataBase(), transactionId);
+    	Transaction.delete(getDataBase(), transaction);
     	transactionDetailCallback.onDeleteSuccess(transaction);
     }
     
@@ -168,4 +165,29 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
         fragment.setArguments(arguments);
         return fragment;
     }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {    	
+    	super.onOptionsItemSelected(item);
+    	
+    	switch(item.getItemId())
+    	{
+    		case android.R.id.home:
+    			this.getActivity().finish();
+    			this.cancelAnimationTransition();
+    			return true;
+    		case R.id.action_edit:    			    			
+    			startActivity(TransactionEditActivity.newIntent(this.getContext(), transactionId) );
+    			this.finish();
+    			this.cancelAnimationTransition();
+    			return true;
+    		case R.id.action_discard:    			
+    			beginDelete();    			
+    			return true;
+    	}
+    	
+    	return true;
+    }
+    
+    
 }
