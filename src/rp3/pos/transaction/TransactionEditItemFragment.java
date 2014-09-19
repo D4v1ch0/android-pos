@@ -38,7 +38,8 @@ public class TransactionEditItemFragment extends BaseFragment {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.fragment_transaction_edit_item);
-		setRetainInstance(true);
+		if(getParentFragment()==null)
+			setRetainInstance(true);
 		
 		Bundle arguments = getArguments();
 		if(arguments!=null && arguments.containsKey(ARG_TRANSACTION_DETAIL_ID)){
@@ -63,8 +64,9 @@ public class TransactionEditItemFragment extends BaseFragment {
 		}
 		else if (!(activity instanceof TransactionEditItemListener)) {
 			throw new IllegalStateException("Activity must implement fragment's TransactionEditItemListener.");
+        }else{
+        	callback = (TransactionEditItemListener)activity;
         }		
-		callback = (TransactionEditItemListener)activity;
 	}
 	
 	@Override
@@ -75,9 +77,9 @@ public class TransactionEditItemFragment extends BaseFragment {
 			
 		setImageButtonClickListener(R.id.button_accept, new View.OnClickListener() {
 			
-			public void onClick(View v) {				
+			public void onClick(View v) {								
 				updateTransactionDetail();				
-				callback.onItemEditAcceptAction(transactionDetail);
+				callback.onItemEditAcceptAction(transactionDetail);			
 				finish();
 			}
 		});

@@ -35,7 +35,7 @@ public class TransactionEditActivity extends rp3.app.BaseActivity
 		super.onCreate(savedInstanceState);
 		
 		setDataBaseParameters(DbOpenHelper.class);
-		setContentView(R.layout.activity_transaction_edit);
+		setContentView(R.layout.activity_transaction_edit, R.menu.activity_transaction_edit);
 		
 		setupActionBar();
 				

@@ -1,16 +1,24 @@
 package rp3.pos;
 
+import java.util.Currency;
+
+import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SearchView;
 import rp3.app.BaseFragment;
 import rp3.pos.model.Transaction;
 import rp3.pos.model.TransactionType;
 import rp3.pos.transaction.TransactionEditActivity;
 
-public class TransactionFragment extends BaseFragment implements TransactionListFragment.TransactionListFragmentListener {
+public class TransactionFragment extends BaseFragment implements TransactionListFragment.TransactionListFragmentListener,
+TransactionDetailFragment.TransactionDetailListener{
 
 	public static final String ARG_TRANSACTIONTYPEID = "transactionTypeId";
 	
@@ -33,20 +41,23 @@ public class TransactionFragment extends BaseFragment implements TransactionList
     }
 	
 	@Override
+	public void onAttach(Activity activity) {		
+		super.onAttach(activity);
+		setContentView(R.layout.fragment_transaction, R.menu.fragment_transaction);
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {		
 		super.onCreate(savedInstanceState);
 		
-		setRetainInstance(true);		
-		
-		setContentView(R.layout.fragment_transaction,R.menu.fragment_transaction);
+		setRetainInstance(true);					
 				
 		if(getArguments().containsKey(ARG_TRANSACTIONTYPEID)){
 		   transactionTypeId = getArguments().getInt(ARG_TRANSACTIONTYPEID);
-		}
-		
-		transactionListFragment = TransactionListFragment.newInstance(transactionTypeId);					
-		
+		}		
+		transactionListFragment = TransactionListFragment.newInstance(transactionTypeId,false);					
 	}
+	
 	
 	@Override
 	public void onFragmentCreateView(View rootView, Bundle savedInstanceState) {		
@@ -60,30 +71,36 @@ public class TransactionFragment extends BaseFragment implements TransactionList
 		
 		if (rootView.findViewById(R.id.content_transaction_detail) != null) {     
 			mTwoPane = true;
-        }
-					
-		if(mTwoPane){
-			transactionListFragment.setActivateOnItemClick(true);			
-		}
-		
+        }									
 	}	
 	
 	@Override
+	public void onResume() {		
+		super.onResume();
+		
+		if(mTwoPane){
+			transactionListFragment.setActivateOnItemClick(true);
+			if(selectedTransactionId!=0)
+				onTransactionSelected(selectedTransactionId);
+		}
+	}
+	
+	@Override
 	public void onAfterCreateOptionsMenu(Menu menu) {		
-//		SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
-//        //SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//    	SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-//        // Assumes current activity is the searchable activity
-//        if(null!=searchManager ) {   
-//            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-//        }
-//        searchView.setIconifiedByDefault(false);
-//        
-//        menuItemActionEdit = menu.findItem(R.id.action_edit);
-//        menuItemActionDiscard = menu.findItem(R.id.action_discard);
-//        
-//        boolean visibleActionDetail = mTwoPane && selectedTransactionId != 0;
-//        setVisibleEditActionButtons(visibleActionDetail);
+		SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
+        //SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+    	SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        // Assumes current activity is the searchable activity
+        if(null!=searchManager ) {   
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        }
+        searchView.setIconifiedByDefault(false);
+        
+        menuItemActionEdit = menu.findItem(R.id.action_edit);
+        menuItemActionDiscard = menu.findItem(R.id.action_discard);
+        
+        boolean visibleActionDetail = mTwoPane && selectedTransactionId != 0;
+        setVisibleEditActionButtons(visibleActionDetail);
 	}
 	
 	 @Override
@@ -135,6 +152,8 @@ public class TransactionFragment extends BaseFragment implements TransactionList
 
 	public void onDeleteSuccess(Transaction transaction) {
 		selectedTransactionId = 0;
+		transactionListFragment.loadTransactions(transactionTypeId);
+		onTransactionSelected(selectedTransactionId);
 		//refreshTransactions();		
 	}
 
@@ -142,15 +161,12 @@ public class TransactionFragment extends BaseFragment implements TransactionList
 	
 	@Override
 	public void onTransactionSelected(long id) {
+		selectedTransactionId = id;        	
+		
 		if (mTwoPane) {
-           
-        	selectedTransactionId = id;
-        	setVisibleEditActionButtons( selectedTransactionId != 0 );
-        	
-        	transactionDetailFragment = TransactionDetailFragment.newInstance(selectedTransactionId); 
-        	
-        	setFragment(R.id.content_transaction_detail, transactionDetailFragment);        	
-
+			setVisibleEditActionButtons( selectedTransactionId != 0 );
+        	transactionDetailFragment = TransactionDetailFragment.newInstance(selectedTransactionId);         	
+        	setFragment(R.id.content_transaction_detail, transactionDetailFragment);
         } else {
         	//waitUpdate = true;        	            
             startActivity(TransactionDetailActivity.newIntent(this.getActivity(), id) );            

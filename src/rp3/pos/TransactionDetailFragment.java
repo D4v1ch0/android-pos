@@ -34,29 +34,26 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
     }
             
     public TransactionDetailFragment() {
-    }
-
+    }   
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);                
-        setRetainInstance(true);
+        super.onCreate(savedInstanceState);   
+        
+        if(getParentFragment()==null)
+        	setRetainInstance(true);
         
         if (getArguments().containsKey(ARG_ITEM_ID)) {            
             transactionId = getArguments().getLong(ARG_ITEM_ID);            
-        }else if(savedInstanceState!=null)
-        {
+        }else if(savedInstanceState!=null){
         	transactionId = savedInstanceState.getLong(STATE_TRANSACTIONID);
         }        
         
-        if(transactionId != 0)
-        {        	
+        if(transactionId != 0){        	
         	transaction = Transaction.getTransaction(getDataBase(), transactionId,true);
         }
         
-        if(transaction!=null){
-        	super.setContentView(R.layout.fragment_transaction_detail, R.menu.fragment_transaction_detail);
-        }
-        else{
+        if(transaction==null){
         	super.setContentView(R.layout.base_content_no_selected_item);
         }        
     }
@@ -64,9 +61,15 @@ public class TransactionDetailFragment extends rp3.app.BaseFragment {
     @Override
     public void onAttach(Activity activity) {    	
     	super.onAttach(activity);
-    	if(!(activity instanceof TransactionDetailListener))
-    		throw new IllegalStateException("Activity must implements Fragment TransactionDetailListener");
-    	transactionDetailCallback = (TransactionDetailListener)activity;
+    	
+    	setContentView(R.layout.fragment_transaction_detail);
+    	
+    	if(getParentFragment()!=null){
+    		transactionDetailCallback = (TransactionDetailListener)getParentFragment();
+    	}else{
+    		transactionDetailCallback = (TransactionDetailListener)activity;
+    	}
+    	    
     }
     
     @Override

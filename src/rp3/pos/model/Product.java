@@ -47,7 +47,7 @@ public class Product {
 		this.price = price;
 	}
 	
-	public static Product getProduct(DataBase db, int productId){
+	public static Product getProduct(DataBase db, long productId){
 		Product product = new Product();		
 		
 		Cursor c = db.rawQuery( QueryDir.getQuery(Contract.Product.QUERY_PRODUCT_BY_ID), productId );
@@ -56,7 +56,7 @@ public class Product {
 		product.setSku( CursorUtils.getString(c, Contract.Product.FIELD_SKU) );
 		product.setDescription( CursorUtils.getString(c, Contract.Product.FIELD_NAME) );
 		product.setPrice( CursorUtils.getDouble(c, Contract.Product.FIELD_PRICE) );
-		product.setProductId( CursorUtils.getInt(c, Contract.Product._ID) );
+		product.setProductId( CursorUtils.getLong(c, Contract.Product._ID) );
 		
 		return product;
 	}

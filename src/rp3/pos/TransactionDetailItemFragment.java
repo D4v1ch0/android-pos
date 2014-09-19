@@ -31,7 +31,8 @@ public class TransactionDetailItemFragment extends BaseFragment {
 		//super.setDataBaseParams(DbOpenHelper.class);
 		
 		setContentView(R.layout.fragment_transaction_detail_item);
-		setRetainInstance(true);
+		if(getParentFragment()==null)
+			setRetainInstance(true);
 		
 		Bundle arguments = getArguments();
 		if(arguments!=null && arguments.containsKey(ARG_TRANSACTION_DETAIL_ID)){

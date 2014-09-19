@@ -26,7 +26,7 @@ public class SyncAdapter extends rp3.content.SyncAdapter {
 		android.os.Debug.waitForDebugger();
 		WebService service = new WebService("tran_soap_maestro", "GetTransactions");
 
-		service.invokeWebService();
+		//service.invokeWebService();
 		
 		SoapObject response = service.getSoapObjectResponse();
 		

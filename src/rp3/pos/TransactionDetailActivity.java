@@ -25,7 +25,7 @@ public class TransactionDetailActivity extends rp3.app.BaseActivity implements T
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transaction_detail);
+        setContentView(R.layout.activity_transaction_detail, R.menu.fragment_transaction_detail);
         setDataBaseParameters(DbOpenHelper.class);               
         
         // Show the Up button in the action bar.
@@ -58,7 +58,7 @@ public class TransactionDetailActivity extends rp3.app.BaseActivity implements T
     
     @Override
 	public void onDeleteSuccess(Transaction transaction) {		
-		startActivity(new Intent(this,TransactionListActivity.class));
+		startActivity(MainActivity.newIntent(this,true));
 		finish();
 	}
     

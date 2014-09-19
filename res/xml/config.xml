@@ -1,4 +1,9 @@
 <config>
+    <appConfiguration>
+        <help>www.rp3.com.ec</help>
+        <allowSettingsOnAut>FALSE</allowSettingsOnAut>
+        <allowHelpOnAut>FALSE</allowHelpOnAut>
+    </appConfiguration>
     <dataBaseConfiguration>       
        <name>Rp3Pos.db</name>
        <version>1</version>

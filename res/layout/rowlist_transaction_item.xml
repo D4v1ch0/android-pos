@@ -15,9 +15,10 @@
         android:orientation="vertical">
         <TextView android:id="@+id/textView_transaction_client"
             android:layout_width="match_parent"            
-            style="@style/Widget.TextView.Highlight.Medium"            
+            style="@style/Widget.TextView.Medium"            
             android:ellipsize="end"
             android:singleLine="true"
+            android:textStyle="bold"
             android:layout_height="wrap_content"/>
         <LinearLayout 
             android:layout_width="match_parent"

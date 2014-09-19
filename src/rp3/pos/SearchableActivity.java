@@ -6,6 +6,7 @@ import rp3.pos.transaction.TransactionEditActivity;
 import android.os.Bundle;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -22,6 +23,7 @@ public class SearchableActivity extends BaseActivity
     private MenuItem menuItemActionDiscard;
     private long selectedTransactionId;
     
+    private TransactionListFragment transactionListFragment;
 	private TransactionDetailFragment transactionDetailFragment;
 	
 	@Override
@@ -30,34 +32,41 @@ public class SearchableActivity extends BaseActivity
 		setContentView(R.layout.fragment_transaction);				
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		
+						
+	    if(!hasFragment(R.id.content_transaction_list)){
+	    	transactionListFragment = TransactionListFragment.newInstance(0,true);
+	    	setFragment(R.id.content_transaction_list, transactionListFragment);
+	    }else{
+	    	transactionListFragment = (TransactionListFragment)getFragment(R.id.content_transaction_list);
+	    }	    	    
+	    	
 	    // Get the intent, verify the action and get the query
 	    Intent intent = getIntent();
 	    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-	    	query = intent.getStringExtra(SearchManager.QUERY);
-	    	executeSearch(query);
+	    	query = intent.getStringExtra(SearchManager.QUERY);	    	
 	    }
-	    	    
-	    if (findViewById(R.id.content_transaction_detail) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
+	    
+	    if (findViewById(R.id.content_transaction_detail) != null) {          
             mTwoPane = true;
-
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-            ((TransactionListFragment) getCurrentFragmentManager()
-                    .findFragmentById(R.id.content_transaction_list))
-                    .setActivateOnItemClick(true);
-        }
+	    }
 	}
-
-	private void executeSearch(String query)
-	{
-		((TransactionListFragment) getCurrentFragmentManager()
-				.findFragmentById(R.id.content_transaction_list)).
-				searchTransactions(query);
+	
+	@Override
+	protected void onResume() {		
+		super.onStart();
+		
+		if(!TextUtils.isEmpty(query))
+			executeSearch(query);
+		
+		if(mTwoPane){
+			transactionListFragment.setActivateOnItemClick(true);
+			if(selectedTransactionId!=0)
+				onTransactionSelected(selectedTransactionId);
+		}
+	}
+	
+	private void executeSearch(String query){
+		transactionListFragment.searchTransactions(query);
 	}
 	
 	@Override
@@ -69,17 +78,14 @@ public class SearchableActivity extends BaseActivity
 			transactionDetailFragment = TransactionDetailFragment.newInstance(selectedTransactionId);
 			setVisibleEditActionButtons( selectedTransactionId != 0 );
 			
-			
-			getCurrentFragmentManager().beginTransaction()
-            .replace(R.id.content_transaction_detail, 
-            		transactionDetailFragment)
-            .commit();
-
+			setFragment(R.id.content_transaction_detail, transactionDetailFragment);			
         } else {           
-            Intent detailIntent = new Intent(this, TransactionDetailActivity.class);
-            detailIntent.putExtra(TransactionDetailFragment.ARG_ITEM_ID, id);
-            detailIntent.putExtra(TransactionDetailFragment.ARG_PARENT_SOURCE, TransactionDetailFragment.PARENT_SOURCE_SEARCH);
-            startActivity(detailIntent);
+        	startActivity(TransactionDetailActivity.newIntent(this, id) );            
+            this.cancelAnimationTransition();
+//            Intent detailIntent = new Intent(this, TransactionDetailActivity.class);
+//            detailIntent.putExtra(TransactionDetailFragment.ARG_ITEM_ID, id);
+//            detailIntent.putExtra(TransactionDetailFragment.ARG_PARENT_SOURCE, TransactionDetailFragment.PARENT_SOURCE_SEARCH);
+//            startActivity(detailIntent);
         }  
 	}
 

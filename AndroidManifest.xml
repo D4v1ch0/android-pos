@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
@@ -29,12 +30,16 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name="rp3.pos.MainActivity" >
-            <intent-filter>
+         <activity
+            android:name="rp3.pos.StartActivity" android:theme="@style/AppTheme.NoTitleBar"
+            >
+           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="rp3.pos.MainActivity" >
+            
             <!-- Only Required for search dialog -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -80,8 +85,10 @@
             android:name="rp3.pos.transaction.TransactionEditItemActivity"
             android:label="@string/title_activity_transaction_edit" >
         </activity>
-
-        <service android:name="rp3.accounts.GenericAccountService" >
+        <activity android:name="rp3.accounts.AuthenticatorActivity" android:theme="@style/AppTheme.NoTitleBar"
+            android:windowSoftInputMode="stateHidden">                        
+        </activity>
+		<service android:name="rp3.accounts.AuthenticatorService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" >
                 </action>
@@ -91,7 +98,7 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" >
             </meta-data>
-        </service>
+        </service>      
 
         <service
                 android:name="rp3.pos.sync.SyncService"

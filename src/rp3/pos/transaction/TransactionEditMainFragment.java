@@ -1,5 +1,7 @@
 package rp3.pos.transaction;
 
+import rp3.configuration.PreferenceManager;
+import rp3.pos.Constants;
 import rp3.pos.R;
 import rp3.pos.adapter.TransactionEditDetailAdapter;
 import rp3.pos.client.SearchClientActivity;
@@ -16,7 +18,9 @@ import rp3.util.Screen;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,7 +50,7 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment
 	private final int REQUEST_CODE_PRODUCT_SEARCH = 2;
 	private final int REQUEST_CODE_DETAIL_EDIT  = 3;
 	private boolean cancelOnPauseUpdate = false;
-		
+	private long pendingInsertProductId = 0;
 	
 	AutoCompleteTextView textEditProduct;
 	
@@ -70,7 +74,7 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment
 		super.onCreate(savedInstanceState);
 		
 		setRetainInstance(true);
-		setContentView(R.layout.fragment_transaction_edit_main, R.menu.activity_transaction_edit);				
+		setContentView(R.layout.fragment_transaction_edit_main);				
 		
 		if(savedInstanceState==null){
 			Bundle arguments = getArguments();
@@ -102,15 +106,14 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment
 		super.onAfterCreateOptionsMenu(menu);
 		
 		MenuItem item = menu.findItem(R.id.action_change_product_insert_mode);
-		
-		if(transaction.getTransactionType().getProductoInsertModePreference() == TransactionType.PREFERENCE_PRODUCT_INSERT_ACTION ){			
+		String pref = PreferenceManager.getString(Constants.PREF_POS_PRODUCT_INSERT_MODE, Constants.PREF_VALUE_POS_PRODUCT_INSERT_WINDOW);
+				
+		if(pref.equals(Constants.PREF_VALUE_POS_PRODUCT_INSERT_WINDOW)){			
 			item.setTitle(R.string.action_change_product_insert_inline);
 		}else{			
 			item.setTitle(R.string.action_change_product_insert_action);				
-		}
-		
-	}
-	
+		}		
+	}	
 	
 	@Override
 	public void onPause() {
@@ -222,20 +225,22 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment
 			return true;
 		case R.id.action_change_product_insert_mode:
 			
-			short newMode;
+			String newMode;
 			
-			if(transaction.getTransactionType().getProductoInsertModePreference() == TransactionType.PREFERENCE_PRODUCT_INSERT_ACTION ){
-				newMode = TransactionType.PREFERENCE_PRODUCT_INSERT_INLINE;
-				item.setTitle(R.string.action_change_product_insert_action);	
+			if(PreferenceManager.getString(Constants.PREF_POS_PRODUCT_INSERT_MODE, 
+					Constants.PREF_VALUE_POS_PRODUCT_INSERT_WINDOW).equals(Constants.PREF_VALUE_POS_PRODUCT_INSERT_WINDOW)){
+				newMode = Constants.PREF_VALUE_POS_PRODUCT_INSERT_INLINE;
+				item.setTitle(R.string.action_change_product_insert_action);
 			}else{
-				newMode = TransactionType.PREFERENCE_PRODUCT_INSERT_ACTION;
+				newMode = Constants.PREF_VALUE_POS_PRODUCT_INSERT_WINDOW;
 				item.setTitle(R.string.action_change_product_insert_inline);				
 			}
+			PreferenceManager.setValue(Constants.PREF_POS_PRODUCT_INSERT_MODE, newMode);
 			
-			transaction.getTransactionType().setProductoInsertModePreference(newMode);
-			TransactionType.updateProductInsertModePreference(getDataBase(),transaction.getTransactionTypeId(),newMode);
+			//transaction.getTransactionType().setProductoInsertModePreference(newMode);
+			//TransactionType.updateProductInsertModePreference(getDataBase(),transaction.getTransactionTypeId(),newMode);
 			
-			setInsertProductMode(newMode);
+			//setInsertProductMode(newMode);
 			
 			return true;
 		default:
@@ -279,6 +284,8 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment
 		TransactionEditItemFragment fragment = TransactionEditItemFragment.newInstance(transactionDetailId);		
 		showDialogFragment(fragment,"detailDialog");
 	}
+	
+	
 	
 	private void startDetailEditActivity(long transactionDetailId){				
 		startActivityForResult( TransactionEditItemActivity.newIntent(getContext(), transactionDetailId), 
@@ -439,28 +446,48 @@ public class TransactionEditMainFragment extends rp3.app.BaseFragment
 		case REQUEST_CODE_CLIENT_SEARCH:
 			if(resultCode == Activity.RESULT_OK)
 			{
-				int client_id = data.getIntExtra(SearchClientActivity.RESULT_ARG_ID, 0);
+				long client_id = data.getLongExtra(SearchClientActivity.RESULT_ARG_ID, 0);
 				Client client = Client.getClientById(getDataBase(), client_id);
-				if(client!=null)
-				{
+				if(client!=null){
 					transaction.setClient(client);
 					updateClient();
 				}
 			}
 			break;
 		case REQUEST_CODE_PRODUCT_SEARCH:
-			if(resultCode == Activity.RESULT_OK)
-			{
-				int productId = data.getIntExtra(ProductSearchActivity.RESULT_ARG_ID, 0);				
-				Product product = Product.getProduct(getDataBase(), productId);
-								
-				TransactionDetail detail = addProduct(productId, product.getSku(), product.getDescription(), product.getPrice(), 0);				
+			if(resultCode == Activity.RESULT_OK) {				
 				
-				
-				onAddDetail(detail);				
+				final long productId = data.getLongExtra(ProductSearchActivity.RESULT_ARG_ID, 0);	
+				if(Screen.isMinLargeLayoutSize(this.getContext())){
+					new AsyncTask<Object, Integer, Boolean>() {
+						@Override
+						protected Boolean doInBackground(Object... params) {				
+							SystemClock.sleep(500);
+							return true;
+						}
+						@Override
+						protected void onPostExecute(Boolean result) {								
+							insertProductFromSearch(productId);
+						}				
+					}.execute();
+				}else{
+					insertProductFromSearch(productId);
+				}
+										
 			}
 			break;		
 		}
+	}	
+	
+	private void insertProductFromSearch(long productId){
+		Product product = Product.getProduct(getDataBase(), productId);				
+		TransactionDetail detail = addProduct(productId, product.getSku(), product.getDescription(), product.getPrice(), 0);
+		onAddDetail(detail);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle arg0) {		
+		super.onSaveInstanceState(arg0);				
 	}	
 	
 	private void updateTransactionResume()

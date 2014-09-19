@@ -21,7 +21,7 @@ public class Transaction extends EntityBase<Transaction> {
 	private int transactionNumber;
 	private int transactionTypeId;
 	private long id;
-	private Integer clientId;
+	private Long clientId;
 	private double total;
 	private double discount;
 	private double taxes;
@@ -68,7 +68,7 @@ public class Transaction extends EntityBase<Transaction> {
 		setValue(Contract.Transaction.COLUMN_SUBTOTAL, this.subtotal);
 		setValue(Contract.Transaction.COLUMN_SUBTOTALBEFORETAXES, this.subtotalBeforeTax);
 		setValue(Contract.Transaction.COLUMN_TAXES, this.taxes);
-		setValue(Contract.Transaction.COLUMN_TOTAL, this.total);
+		setValue(Contract.Transaction.COLUMN_TOTAL, this.total);		
 		setValue(Contract.Transaction.COLUMN_TRANSACTIONDATE, this.transactionDate);
 		setValue(Contract.Transaction.COLUMN_TRANSACTIONNUMBER, this.transactionNumber);
 		setValue(Contract.Transaction.COLUMN_TRANSACTIONTYPEID, this.transactionTypeId);
@@ -114,10 +114,10 @@ public class Transaction extends EntityBase<Transaction> {
 	public void setTransactionNumber(int transactionNumber) {
 		this.transactionNumber = transactionNumber;
 	}
-	public Integer getClientId() {
+	public Long getClientId() {
 		return clientId;
 	}
-	public void setClientId(Integer clientId) {
+	public void setClientId(Long clientId) {
 		this.clientId = clientId;
 	}
 	public double getTotal() {
@@ -377,7 +377,7 @@ public class Transaction extends EntityBase<Transaction> {
 			result = super.insertDb(db);
 			
 			if(result){
-				TransactionExt ext = new TransactionExt();				
+				TransactionExt ext = new TransactionExt();					
 				result = TransactionExt.insert(db, ext);
 			}
 			
@@ -410,14 +410,20 @@ public class Transaction extends EntityBase<Transaction> {
 			result = super.updateDb(db);
 			
 			if(result){
-				for(TransactionDetail d : this.getTransactionDetails()){
-					d.setTransactionId(this.id);
-					if(d.getID() == 0)
-						result = TransactionDetail.insert(db, d);
-					else
-						result = TransactionDetail.update(db, d);
-					if(!result) break;					
-				}								
+				
+				TransactionExt ext = new TransactionExt();
+				result = TransactionExt.update(db, ext);
+				
+				if(result){
+					for(TransactionDetail d : this.getTransactionDetails()){
+						d.setTransactionId(this.id);
+						if(d.getID() == 0)
+							result = TransactionDetail.insert(db, d);
+						else
+							result = TransactionDetail.update(db, d);
+						if(!result) break;					
+					}		
+				}
 				
 				if(result)
 					db.commitTransaction();								
@@ -481,6 +487,7 @@ public class Transaction extends EntityBase<Transaction> {
 
 		@Override
 		public void setValues() {				
+			setValue(Contract.TransactionExt.COLUMN_ID, id);
 			setValue(Contract.TransactionExt.COLUMN_CLIENT_CARID, clientCardId);
 			setValue(Contract.TransactionExt.COLUMN_CLIENT_NAMES, clientFullName);
 			setValue(Contract.TransactionExt.COLUMN_CODE, transactionCode);
@@ -496,6 +503,11 @@ public class Transaction extends EntityBase<Transaction> {
 		@Override
 		public String getDescription() {			
 			return transactionCode;
+		}
+		
+		@Override
+		public String getWhere() {			
+			return Contract.TransactionExt.COLUMN_ID + " = ?";
 		}
 		
 	}

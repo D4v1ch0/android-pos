@@ -17,8 +17,10 @@ import rp3.pos.model.Transaction;
 public class TransactionListFragment extends rp3.app.BaseListFragment {
 		    
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
+    private static final String STATE_SEARCH = "searchmode";
     
     public static final String ARG_TRANSACTIONTYPEID = "transactionTypeId";
+    public static final String ARG_SEARCHMODE = "searchMode";
     
     private static final int LOADER_MODE_SEARCH_TEXT = 1;
     private static final int LOADER_MODE_SEARCH_TRANSACTIONTYPE = 2;
@@ -31,12 +33,14 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     private int mActivatedPosition = ListView.INVALID_POSITION;
     private SimpleCursorAdapter adapter;  
     private int currentTransactionTypeId;
+    private boolean useSearchMode = false;
     
     
-    public static TransactionListFragment newInstance(int transactionTypeId) {
+    public static TransactionListFragment newInstance(int transactionTypeId, boolean useSearchMode) {
     	TransactionListFragment fragment = new TransactionListFragment();
 		Bundle args = new Bundle();
 		args.putInt(ARG_TRANSACTIONTYPEID, transactionTypeId);
+		args.putBoolean(ARG_SEARCHMODE, useSearchMode);
 		fragment.setArguments(args);
 		return fragment;
     }
@@ -54,7 +58,8 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
         super.onCreate(savedInstanceState);
           
      currentTransactionTypeId = getArguments().getInt(ARG_TRANSACTIONTYPEID);
-        
+     useSearchMode = getArguments().getBoolean(ARG_SEARCHMODE,false);
+     
      String[] fields = {
          Contract.Transaction.FIELD_TRANSACTIONDATE,
          Contract.Transaction.FIELD_TOTAL,
@@ -103,13 +108,14 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {    	
     	super.onActivityCreated(savedInstanceState);
     	
-    	Bundle b = new Bundle();
-    	b.putInt(LOADER_ARG_SEARCH_MODE, LOADER_MODE_SEARCH_TRANSACTIONTYPE);
-    	b.putInt(LOADER_ARG_SEARCH_TRANSACTIONTYPEID, currentTransactionTypeId);
-    	
-    	executeLoader(0, b, this);
+//    	Bundle b = new Bundle();
+//    	b.putInt(LOADER_ARG_SEARCH_MODE, LOADER_MODE_SEARCH_TRANSACTIONTYPE);
+//    	b.putInt(LOADER_ARG_SEARCH_TRANSACTIONTYPEID, currentTransactionTypeId);
+//    	
+//    	executeLoader(0, b, this);
     	
     }
+        
     
     @Override
     public void onStart() {    	
@@ -117,14 +123,23 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     }
          
     
-    public void searchTransactions(String termSearch)
-    {
+    public void searchTransactions(String termSearch){
     	Bundle b = new Bundle();
     	b.putInt(LOADER_ARG_SEARCH_MODE, LOADER_MODE_SEARCH_TEXT);
     	b.putString(LOADER_ARG_SEARCH_TEXT, termSearch);
     	
     	executeLoader(0, b, this);
     }      
+    
+    @Override
+    public void onResume() {    	
+    	super.onResume();
+    	
+    	if(!useSearchMode){
+    		loadTransactions(currentTransactionTypeId);
+    	}
+    }
+        
     
     public void loadTransactions(int transactionType)
     {
@@ -133,7 +148,7 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     	b.putInt(LOADER_ARG_SEARCH_TRANSACTIONTYPEID, transactionType);
     	
     	executeLoader(0, b, this);
-    }
+    }        
     
 	@Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -152,7 +167,11 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         
-        transactionListFragmentCallback = (TransactionListFragmentListener)getParentFragment();
+        if(getParentFragment()!=null){        	
+        	transactionListFragmentCallback = (TransactionListFragmentListener)getParentFragment();
+        }else{
+        	transactionListFragmentCallback = (TransactionListFragmentListener) activity;
+        }
 //
 //        // Activities containing this fragment must implement its callbacks.
 //        if (!(activity instanceof Callbacks)) {
@@ -173,7 +192,8 @@ public class TransactionListFragment extends rp3.app.BaseListFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mActivatedPosition != ListView.INVALID_POSITION) {
-            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);            
+            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);     
+            outState.putBoolean(STATE_SEARCH, useSearchMode);
         }
     }
     

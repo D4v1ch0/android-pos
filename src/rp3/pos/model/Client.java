@@ -6,16 +6,16 @@ import android.database.Cursor;
 
 public class Client {
 
-	private int id;
+	private long id;
 	private String cardId;
 	private String names;
 	private String lastNames;
 	private String address;
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	public String getCardId() {
@@ -57,7 +57,7 @@ public class Client {
 		return c;
 	}
 	
-	public static Client getClientById(DataBase db,int id){
+	public static Client getClientById(DataBase db,long id){
 		String query = Contract.Client.QUERY_CLIENT_BY_ID;
 		
 		Cursor c = db.rawQuery(query, id );
@@ -65,7 +65,7 @@ public class Client {
 		
 		Client client = new Client();
 		client.setCardId( c.getString( c.getColumnIndex(Contract.Client.FIELD_CARDID) ) );
-		client.setId( c.getInt( c.getColumnIndex(Contract.Client._ID) ) );
+		client.setId( c.getLong( c.getColumnIndex(Contract.Client._ID) ) );
 		client.setLastNames( c.getString( c.getColumnIndex(Contract.Client.FIELD_LASTNAMES) ) );
 		client.setNames( c.getString( c.getColumnIndex(Contract.Client.FIELD_NAMES) ) );
 		client.setAddress( c.getString( c.getColumnIndex(Contract.Client.FIELD_ADDRESS) ) );
