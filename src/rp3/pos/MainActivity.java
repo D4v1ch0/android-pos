@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import rp3.app.NavActivity;
 import rp3.app.nav.NavItem;
+import rp3.content.SimpleCallback;
 import rp3.core.R;
+import rp3.data.MessageCollection;
 import rp3.pos.db.DbOpenHelper;
 import rp3.pos.model.TransactionType;
+import rp3.pos.sync.SyncAdapter;
 import rp3.runtime.Session;
 
 public class MainActivity extends NavActivity {
@@ -68,17 +71,11 @@ public class MainActivity extends NavActivity {
 			break;
 		case NAV_SYNC:	
 			showDialogProgress(R.string.message_title_synchronizing, R.string.message_please_wait);
-			new AsyncTask<Object, Integer, Boolean>() {
-				@Override
-				protected Boolean doInBackground(Object... params) {				
-					SystemClock.sleep(3000);
-					return true;
-				}
-				@Override
-				protected void onPostExecute(Boolean result) {								
-					closeDialogProgress();
-				}				
-			}.execute();
+			
+			Bundle bundle = new Bundle();
+			bundle.putString(SyncAdapter.ARG_SYNC_TYPE, SyncAdapter.SYNC_TYPE_GENERAL);
+			requestSync(bundle);
+			
 			break;
 			
 		default:
@@ -86,6 +83,19 @@ public class MainActivity extends NavActivity {
 					item.getTitle());
 			break;
 		}
+	}
+	
+	public void onSyncComplete(Bundle data, final MessageCollection messages) {		
+		
+		if(data.getString(SyncAdapter.ARG_SYNC_TYPE).equals(SyncAdapter.SYNC_TYPE_GENERAL)){
+			closeDialogProgress();
+			if(messages.hasErrorMessage()){
+				showDialogMessage(messages);
+			}else{
+				reset();
+			}
+		}
+		
 	}
 
 	@Override

@@ -10,16 +10,33 @@
     </dataBaseConfiguration>
     <webServiceConfiguration>
         <webServiceData>
-            <name>aut</name>           
-            <url>http://192.168.0.102/Rp3Pos/Rp3.Pos.Services.Transactions.svc/web</url>                        
-            <type>REST</type>
+            <name>Core</name>           
+            <url>http://10.10.0.160/Pos/api</url>                        
+            <type>REST</type>            
+            <oAuthClientId>loteria-pos-cliente</oAuthClientId>
+            <oAuthClientSecret>loterianacionalpos</oAuthClientSecret>
             <methods>
                 <method>
-                    <name>login</name>
-                    <action>json/aut</action>
+                    <name>SignIn</name>
+                    <action>account/signin</action>
                     <webMethod>POST</webMethod>
-                </method>                
-            </methods>
+                </method>
+                <method>
+                    <name>GetGeopoliticalStructures</name>
+                    <action>General/GetGeopoliticalStructures</action>
+                    <webMethod>GET</webMethod>
+                </method>
+                <method>
+                    <name>GetGeneralValues</name>
+                    <action>General/GetGeneralValues</action>
+                    <webMethod>GET</webMethod>
+                </method>
+                <method>
+                    <name>GetIdentificationTypes</name>
+                    <action>General/GetIdentificationTypes</action>
+                    <webMethod>GET</webMethod>
+                </method>                 
+            </methods>            
         </webServiceData>        
         <webServiceData>
             <name>tran_rest</name>           
@@ -50,21 +67,6 @@
 					<methodId>GetSoapXmlTransactions</methodId>
                 </method>
             </methods>
-        </webServiceData>
-        <webServiceData>
-            <name>tran_soap_maestro</name>
-            <url>http://192.168.0.102/Rp3WsPosTablet/Rp3.Maestro.Pos.asmx</url>
-            <type>SOAP</type>
-            <namespace>http://tempuri.org/</namespace>            
-            <dotNet>TRUE</dotNet>
-            <soapVersion>11</soapVersion>
-            <methods>
-                <method>
-					<name>GetTransactions</name>
-					<action>http://tempuri.org/GetAlerts</action>
-					<methodId>GetAlerts</methodId>
-                </method>
-            </methods>
-        </webServiceData>
+        </webServiceData>       
     </webServiceConfiguration>
 </config>
