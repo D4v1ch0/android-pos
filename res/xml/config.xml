@@ -11,7 +11,7 @@
     <webServiceConfiguration>
         <webServiceData>
             <name>Core</name>           
-            <url>http://10.10.0.160/Pos/api</url>                        
+            <url>http://192.168.0.103/Pos/api</url>                        
             <type>REST</type>            
             <oAuthClientId>loteria-pos-cliente</oAuthClientId>
             <oAuthClientSecret>loterianacionalpos</oAuthClientSecret>

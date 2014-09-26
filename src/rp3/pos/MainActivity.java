@@ -4,12 +4,9 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import rp3.app.NavActivity;
 import rp3.app.nav.NavItem;
-import rp3.content.SimpleCallback;
 import rp3.core.R;
 import rp3.data.MessageCollection;
 import rp3.pos.db.DbOpenHelper;
